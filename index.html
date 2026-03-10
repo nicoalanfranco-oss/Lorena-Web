@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Lorena Lliviría - Pilates &amp; Fisioterapia</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#00bdd6",
+                        "background-light": "#ffffff",
+                        "professional-grey": "#424242",
+                        "soft-grey": "#f5f8f8",
+                    },
+                    fontFamily: {
+                        "display": ["Outfit", "sans-serif"]
+                    },
+                },
+            },
+        }
+    </script>
+</head>
+
+<body class="bg-background-light text-professional-grey font-display">
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
+
+    <div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+
+        <!-- Header / Navigation -->
+        <header>
+            <nav class="navbar glass-card">
+                <div class="logo-container">
+                    <img src="Logo Lorena.png" alt="Lorena Lliviría" class="main-logo"
+                        style="max-height: 45px; object-fit: contain;">
+                </div>
+                <div class="navbar-brand">
+                    <span class="brand-text shadow-text">LORENA LLIVIRÍA</span>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="#hero">Inicio</a></li>
+                    <li><a href="#enfoque">Enfoque</a></li>
+                    <li><a href="#servicios">Servicios</a></li>
+                    <li><a href="#testimonios">Testimonios</a></li>
+                    <li><a href="#consejos">Consejos</a></li>
+                    <li><a href="#contacto" class="btn-primary">Contacto</a></li>
+                </ul>
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </nav>
+        </header>
+
+        <main class="flex-grow pt-20">
+            <!-- Hero Section -->
+            <section id="hero" class="hero-section"
+                style="background-image: url('LorePilates.jpeg'); background-size: cover; background-position: center;">
+                <div class="hero-overlay"></div>
+                <div class="hero-content">
+                    <h1 class="hero-title">Bienestar Guiado <br />por <span class="gradient-text">Expertos</span></h1>
+                    <p class="hero-subtitle">
+                        Pilates e intervención de Fisioterapia dictados exclusivamente por una Licenciada en
+                        Fisioterapia. Enfoque técnico para resultados duraderos.
+                    </p>
+                    <div class="hero-cta">
+                        <a href="#contacto" class="btn-primary glow-effect">Reservar Evaluación</a>
+                        <a href="#servicios" class="btn-secondary">Servicios</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Integral Approach Section -->
+            <section class="py-24 bg-white" id="enfoque">
+                <div class="mx-auto max-w-7xl px-6 lg:px-10">
+                    <div class="grid items-center gap-16 lg:grid-cols-2">
+                        <div class="space-y-8 reveal-left">
+                            <div>
+                                <h2 class="text-sm font-bold uppercase tracking-widest text-[#00bdd6]">Pilates con el
+                                    Cuidado de la Fisioterapia</h2>
+                                <h3 class="mt-2 text-4xl font-black text-professional-grey">Un Enfoque Integral para tu
+                                    Bienestar</h3>
+                                <p class="mt-4 text-lg text-professional-grey/70">La combinación de Pilates y
+                                    Fisioterapia es mucho más que una tendencia; es la estrategia más efectiva para
+                                    acelerar la recuperación de lesiones, mejorar la movilidad y fortalecer el cuerpo
+                                    desde el conocimiento.</p>
+                                <p class="mt-4 text-lg text-professional-grey/70">En Lorena Lliviría Fisioterapia &
+                                    Pilates, creemos en el bienestar guiado por expertos. Por eso, nuestras sesiones no
+                                    son solo movimiento, sino una intervención de salud integral.</p>
+                            </div>
+                            <button id="btn-filosofia" class="btn-secondary mt-4">Nuestra Filosofía</button>
+                        </div>
+                        <div class="space-y-6 reveal-right">
+                            <h4 class="font-black text-2xl text-professional-grey border-b border-soft-grey pb-4">¿Qué
+                                hace diferente a nuestro método?</h4>
+
+                            <div class="flex items-start gap-4 hover:translate-x-2 transition-transform cursor-default">
+                                <div
+                                    class="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-soft-grey text-[#00bdd6] shadow-sm">
+                                    <span class="material-symbols-outlined">shield</span>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-professional-grey">Seguridad Absoluta</h4>
+                                    <p class="text-sm text-professional-grey/70">Cada movimiento es supervisado con ojo
+                                        clínico para evitar lesiones.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-4 hover:translate-x-2 transition-transform cursor-default">
+                                <div
+                                    class="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-soft-grey text-[#00bdd6] shadow-sm">
+                                    <span class="material-symbols-outlined">api</span>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-professional-grey">Precisión Técnica</h4>
+                                    <p class="text-sm text-professional-grey/70">Ajustes específicos basados en tu
+                                        anatomía y patologías previas.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-4 hover:translate-x-2 transition-transform cursor-default">
+                                <div
+                                    class="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-soft-grey text-[#00bdd6] shadow-sm">
+                                    <span class="material-symbols-outlined">accessibility_new</span>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-professional-grey">Enfoque en el Core</h4>
+                                    <p class="text-sm text-professional-grey/70">Trabajo profundo de la musculatura
+                                        abdominal, lumbar y del suelo pélvico para estabilizar.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Services Section -->
+            <section class="py-24 bg-soft-grey" id="servicios">
+                <div class="mx-auto max-w-7xl px-6 lg:px-10">
+                    <div class="mb-16 max-w-2xl reveal-bottom text-center mx-auto">
+                        <h2 class="text-sm font-bold uppercase tracking-widest text-[#00bdd6]">Especialidades</h2>
+                        <h3 class="mt-2 text-4xl font-black text-professional-grey">Nuestros Servicios</h3>
+                        <p class="mt-4 text-lg text-professional-grey/70">Tu salud merece un diseño experto. No solo
+                            entrenamos tu cuerpo, lo transformamos desde la ciencia de la fisioterapia.</p>
+                    </div>
+
+                    <div class="grid gap-8 md:grid-cols-3">
+                        <!-- Pilates -->
+                        <div class="group reveal-left glass-card-service flex flex-col gap-4 rounded-xl border border-transparent p-4 transition-all hover:bg-white hover:shadow-2xl cursor-pointer"
+                            id="card-pilates">
+                            <div class="h-48 w-full overflow-hidden rounded-lg">
+                                <img class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                    src="image - 2026-01-19T095603.021.png" />
+                            </div>
+                            <h4 class="text-2xl font-black text-professional-grey">Pilates</h4>
+                            <p class="text-sm leading-relaxed text-professional-grey/70 font-bold">Esculpe, Tonifica y
+                                Sana.</p>
+                            <p class="text-sm leading-relaxed text-professional-grey/70 mt-1">Clases dictadas
+                                exclusivamente por una Licenciada en Fisioterapia, garantizando precisión técnica y
+                                seguridad absoluta.</p>
+                            <div
+                                class="mt-auto pt-4 border-t border-gray-100 flex items-center text-[#00bdd6] font-bold text-sm">
+                                <span>Ver Planes y Detalles</span>
+                                <i
+                                    class="fas fa-arrow-right ml-auto group-hover:translate-x-1 transition-transform"></i>
+                            </div>
+                        </div>
+
+                        <!-- Fisioterapia -->
+                        <div class="group reveal-bottom glass-card-service flex flex-col gap-4 rounded-xl border border-transparent p-4 transition-all hover:bg-white hover:shadow-2xl cursor-pointer"
+                            id="card-fisio">
+                            <div class="h-48 w-full overflow-hidden rounded-lg">
+                                <img class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                    src="image - 2026-01-20T084647.367.png" />
+                            </div>
+                            <h4 class="text-2xl font-black text-professional-grey">Fisioterapia</h4>
+                            <p class="text-sm leading-relaxed text-professional-grey/70 font-bold">Intervención
+                                Profesional y Rehabilitación.</p>
+                            <p class="text-sm leading-relaxed text-professional-grey/70 mt-1">Un enfoque de salud
+                                integral que combina técnicas manuales con rigor científico para tratar el origen del
+                                problema.</p>
+                            <div
+                                class="mt-auto pt-4 border-t border-gray-100 flex items-center text-[#00bdd6] font-bold text-sm">
+                                <span>Descubrir Más</span>
+                                <i
+                                    class="fas fa-arrow-right ml-auto group-hover:translate-x-1 transition-transform"></i>
+                            </div>
+                        </div>
+
+                        <!-- Gimnasia Laboral -->
+                        <div class="group reveal-right glass-card-service flex flex-col gap-4 rounded-xl border border-transparent p-4 transition-all hover:bg-white hover:shadow-2xl cursor-pointer"
+                            id="card-laboral">
+                            <div class="h-48 w-full overflow-hidden rounded-lg">
+                                <img class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                    src="image - 2026-01-19T093725.171.png" />
+                            </div>
+                            <h4 class="text-2xl font-black text-professional-grey">Gimnasia Laboral</h4>
+                            <p class="text-sm leading-relaxed text-professional-grey/70 font-bold">Bienestar Corporativo
+                                y Productividad.</p>
+                            <p class="text-sm leading-relaxed text-professional-grey/70 mt-1">Programas diseñados para
+                                empresas que buscan prevenir lesiones laborales y reducir el estrés del equipo mediante
+                                el movimiento guiado.</p>
+                            <div
+                                class="mt-auto pt-4 border-t border-gray-100 flex items-center text-[#00bdd6] font-bold text-sm">
+                                <span>Consultar Programas</span>
+                                <i
+                                    class="fas fa-arrow-right ml-auto group-hover:translate-x-1 transition-transform"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Text Testimonials Section -->
+            <section class="py-24 bg-white" id="testimonios">
+                <div class="mx-auto max-w-7xl px-6 lg:px-10">
+                    <div class="mb-16 reveal-bottom text-center">
+                        <h2 class="text-sm font-bold uppercase tracking-widest text-[#00bdd6]">Experiencias</h2>
+                        <h3 class="mt-2 text-4xl font-black text-professional-grey">Nuestros Alumnos Dicen</h3>
+                    </div>
+
+                    <div class="grid gap-6 md:grid-cols-3">
+                        <div
+                            class="glass-card-form reveal-left p-8 relative overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:border-[#00bdd6]/50">
+                            <div class="absolute -top-4 -right-4 text-[#00bdd6] opacity-10 text-9xl font-serif">"</div>
+                            <p class="text-professional-grey/80 italic mb-6 relative z-10">"Llevo años viniendo a
+                                pilates y, sin duda, son los mejores. Siempre aciertan con el ejercicio, cuando dejo de
+                                ir comienzan los dolores. Soy muy especial, y he seguido a Lorena desde el inicio por
+                                que me hace sentir bien!. ¡Gracias!"</p>
+                            <h5 class="font-bold text-professional-grey">— Renata</h5>
+                        </div>
+                        <div
+                            class="glass-card-form reveal-bottom p-8 relative overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:border-[#00bdd6]/50">
+                            <div class="absolute -top-4 -right-4 text-[#00bdd6] opacity-10 text-9xl font-serif">"</div>
+                            <p class="text-professional-grey/80 italic mb-6 relative z-10">"¡Dios mío! Es increíble
+                                hicieron un trabajo genial me siento plena. Mi hermana y yo vinimos un día al centro y
+                                decidimos probar. ¡Nunca mas lo abandoné!"</p>
+                            <br>
+                            <h5 class="font-bold text-professional-grey">— Gabriela</h5>
+                        </div>
+                        <div
+                            class="glass-card-form reveal-right p-8 relative overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:border-[#00bdd6]/50">
+                            <div class="absolute -top-4 -right-4 text-[#00bdd6] opacity-10 text-9xl font-serif">"</div>
+                            <p class="text-professional-grey/80 italic mb-6 relative z-10">"Tengo que admitir que soy
+                                una clienta exigente. Me dejé asesorar por Lorena y no puedo estar más contenta. ¡Me ha
+                                dejado estupenda y me siento genial! Gracias a la mejor. Recomiendo Pilates a todos mis
+                                amigos. ¡Me encanta este sitio!"</p>
+                            <h5 class="font-bold text-professional-grey">— Ana Inés</h5>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tips & Props Gallery (Hover Grid) -->
+            <section class="py-24 bg-soft-grey" id="consejos">
+                <div class="mx-auto max-w-7xl px-6 lg:px-10">
+                    <div class="mb-12 reveal-bottom text-center mx-auto max-w-3xl">
+                        <h2 class="text-sm font-bold uppercase tracking-widest text-[#00bdd6]">Conexión y Movimiento
+                        </h2>
+                        <h3 class="mt-2 text-4xl font-black text-professional-grey">Nuestros Equipos y Consejos</h3>
+                        <p class="mt-4 text-lg text-professional-grey/70">Redescubre tu fuerza con cada detalle. Los
+                            pequeños props son nuestros aliados para profundizar en el movimiento.</p>
+                    </div>
+
+                    <div class="tips-grid reveal-bottom">
+                        <!-- Tip 1 -->
+                        <div class="tip-card overflow-hidden rounded-2xl relative group h-64 md:h-80 w-full"
+                            style="background-image: url('image - 2026-01-20T094625.055.png'); background-size: cover; background-position: center;">
+                            <div
+                                class="tip-overlay absolute inset-0 bg-gradient-to-t from-gray-900/90 to-gray-900/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center p-6 text-center">
+                                <p
+                                    class="text-white font-medium text-lg lg:text-xl translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                                    "Cada movimiento en el Reformer es una conversación con tu cuerpo. Una secuencia que
+                                    fortalece, alarga y te reconecta."</p>
+                            </div>
+                        </div>
+
+                        <!-- Tip 2 -->
+                        <div class="tip-card overflow-hidden rounded-2xl relative group h-64 md:h-80 w-full"
+                            style="background-image: url('image - 2026-01-19T095119.373.png'); background-size: cover; background-position: center;">
+                            <div
+                                class="tip-overlay absolute inset-0 bg-gradient-to-t from-gray-900/90 to-gray-900/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center p-6 text-center">
+                                <p
+                                    class="text-white font-medium text-lg lg:text-xl translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                                    "El Aro Mágico es más que un accesorio: es un foco de intención y fuerza. Descubre
+                                    cómo potenciar tu centro con precisión."</p>
+                            </div>
+                        </div>
+
+                        <!-- Tip 3 -->
+                        <div class="tip-card overflow-hidden rounded-2xl relative group h-64 md:h-80 w-full"
+                            style="background-image: url('image - 2026-01-19T202816.569.png'); background-size: cover; background-position: center;">
+                            <div
+                                class="tip-overlay absolute inset-0 bg-gradient-to-t from-gray-900/90 to-gray-900/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center p-6 text-center">
+                                <p
+                                    class="text-white font-medium text-lg lg:text-xl translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                                    "En el Cadillac, tu cuerpo encuentra el espacio que necesita para respirar y
+                                    fortalecerse bajo pura conexión."</p>
+                            </div>
+                        </div>
+
+                        <!-- Tip 4 -->
+                        <div class="tip-card overflow-hidden rounded-2xl relative group h-64 md:h-80 w-full"
+                            style="background-image: url('image - 2026-01-20T093409.441.png'); background-size: cover; background-position: center;">
+                            <div
+                                class="tip-overlay absolute inset-0 bg-gradient-to-t from-gray-900/90 to-gray-900/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center p-6 text-center">
+                                <p
+                                    class="text-white font-medium text-lg lg:text-xl translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                                    "Siente cómo cada fibra de tu cuerpo se activa con las bandas de resistencia. Un
+                                    diálogo preciso entre fuerza y control."</p>
+                            </div>
+                        </div>
+
+                        <!-- Tip 5 -->
+                        <div class="tip-card overflow-hidden rounded-2xl relative group h-64 md:h-80 w-full"
+                            style="background-image: url('image - 2026-01-19T210101.691.png'); background-size: cover; background-position: center;">
+                            <div
+                                class="tip-overlay absolute inset-0 bg-gradient-to-t from-gray-900/90 to-gray-900/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center p-6 text-center">
+                                <p
+                                    class="text-white font-medium text-lg lg:text-xl translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                                    "Redescubre el equilibrio en cada vértebra. El foam roller nos invita a un
+                                    movimiento consciente, liberando tensiones y reconectando con nuestro centro. Un
+                                    momento para ti, guiado con la seguridad de la fisioterapia."</p>
+                            </div>
+                        </div>
+
+                        <!-- Tip 6 -->
+                        <div class="tip-card overflow-hidden rounded-2xl relative group h-64 md:h-80 w-full"
+                            style="background-image: url('image - 2026-01-19T210801.695.png'); background-size: cover; background-position: center;">
+                            <div
+                                class="tip-overlay absolute inset-0 bg-gradient-to-t from-gray-900/90 to-gray-900/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center p-6 text-center">
+                                <p
+                                    class="text-white font-medium text-lg lg:text-xl translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                                    "Siente cómo tu columna se alarga y tu cuerpo se libera en el step barrel. Es más
+                                    que un ejercicio, es un diálogo profundo contigo misma, guiado con la seguridad de
+                                    la fisioterapia."</p>
+                            </div>
+                        </div>
+
+                        <!-- Tip 7 -->
+                        <div class="tip-card overflow-hidden rounded-2xl relative group h-64 md:h-80 w-full"
+                            style="background-image: url('image - 2026-01-20T130909.359.png'); background-size: cover; background-position: center;">
+                            <div
+                                class="tip-overlay absolute inset-0 bg-gradient-to-t from-gray-900/90 to-gray-900/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center p-6 text-center">
+                                <p
+                                    class="text-white font-medium text-lg lg:text-xl translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                                    "Redescubre tu fuerza con cada detalle. Los pequeños props son nuestros aliados para
+                                    profundizar en el movimiento, ofreciéndote soporte, conciencia y un nuevo nivel de
+                                    conexión contigo misma. Es tu momento, es tu cuidado."</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center mt-12 mb-8 italic text-lg text-[#00bdd6] font-medium reveal-bottom">
+                        "Más allá del movimiento, está la escucha. Aquí, tu recuperación es el primer paso para
+                        reconectar."
+                    </div>
+                </div>
+            </section>
+
+            <!-- Schedules & Location (Pre-Footer) -->
+            <section class="py-24 bg-white border-t border-soft-grey relative overflow-hidden" id="horarios">
+                <div class="absolute top-0 right-0 w-1/2 h-full bg-soft-grey opacity-50 -z-10 clip-path-diagonal"></div>
+                <div class="mx-auto max-w-7xl px-6 lg:px-10">
+                    <div class="grid lg:grid-cols-2 gap-16 items-center">
+                        <div class="reveal-left">
+                            <h2 class="text-4xl font-black text-professional-grey mb-6">Horarios y Citas</h2>
+                            <p class="text-lg text-professional-grey/70 mb-8">Para reservar una cita, llama al <strong
+                                    class="text-[#00bdd6]">099 91 86 40</strong> o envía un mensaje por WhatsApp.</p>
+
+                            <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+                                <table class="w-full text-left">
+                                    <thead class="bg-gray-50 text-professional-grey font-bold">
+                                        <tr>
+                                            <th class="p-4 border-b">Día</th>
+                                            <th class="p-4 border-b">Turno AM</th>
+                                            <th class="p-4 border-b">Turno PM</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="text-professional-grey/80">
+                                        <tr class="border-b">
+                                            <td class="p-4 font-semibold">Lunes</td>
+                                            <td class="p-4 text-[#00bdd6]">08:00 - 09:00</td>
+                                            <td class="p-4 text-[#00bdd6]">15:00 - 18:00</td>
+                                        </tr>
+                                        <tr class="border-b bg-gray-50/50">
+                                            <td class="p-4 font-semibold">Martes</td>
+                                            <td class="p-4">--</td>
+                                            <td class="p-4 text-[#00bdd6]">15:00 - 18:00</td>
+                                        </tr>
+                                        <tr class="border-b">
+                                            <td class="p-4 font-semibold">Miércoles</td>
+                                            <td class="p-4 text-[#00bdd6]">08:00 - 09:00</td>
+                                            <td class="p-4 text-[#00bdd6]">15:00 - 18:00</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="p-4 font-semibold">Jueves</td>
+                                            <td class="p-4">--</td>
+                                            <td class="p-4 text-[#00bdd6]">15:00 - 18:00</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="reveal-right">
+                            <h2 class="text-4xl font-black text-professional-grey mb-6">Visítanos</h2>
+                            <p class="text-lg text-professional-grey/70 mb-6">Estamos en la calle General Flores 377, en
+                                la esquina con Dr. Elias Abdo. ¡Esperamos verte pronto!</p>
+
+                            <div class="w-full h-64 rounded-2xl overflow-hidden shadow-lg border border-gray-200">
+                                <!-- Placeholder iframe para Mapa. Si prefieres una imagen, cámbiala. -->
+                                <iframe
+                                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3393.308259461141!2d-55.9818804!3d-31.7335122!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x95085e6834cf818b%3A0xb30613a7b147348e!2sGral.%20Flores%20377%2C%20Tacuaremb%C3%B3!5e0!3m2!1ses!2suy!4v1700000000000!5m2!1ses!2suy"
+                                    width="100%" height="100%" style="border:0;" allowfullscreen=""
+                                    loading="lazy"></iframe>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Contact Form Section -->
+            <section id="contacto" class="contact-section py-24 bg-soft-grey text-center">
+                <div class="container mx-auto px-6 reveal-bottom">
+                    <h2 class="text-4xl font-black text-professional-grey mb-4 lg:text-5xl">Comienza tu camino hacia el
+                        <span class="gradient-text">Bienestar Real</span>
+                    </h2>
+                    <p class="mx-auto mt-6 max-w-2xl text-lg text-professional-grey/70 mb-10">
+                        "Fortalece tu cuerpo desde el conocimiento, no solo el movimiento". Agenda tu evaluación
+                        inicial.
+                    </p>
+
+                    <div class="glass-card-form text-left mx-auto max-w-3xl p-8">
+                        <form id="contact-form">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <input type="text" id="nombre" required placeholder="Nombre"
+                                    class="w-full p-4 rounded-xl border border-gray-200 bg-gray-50 focus:border-[#00bdd6] focus:ring-2 focus:ring-[#00bdd6]/20 outline-none transition-all">
+                                <input type="text" id="apellido" required placeholder="Apellido"
+                                    class="w-full p-4 rounded-xl border border-gray-200 bg-gray-50 focus:border-[#00bdd6] focus:ring-2 focus:ring-[#00bdd6]/20 outline-none transition-all">
+                                <input type="tel" id="telefono" required placeholder="Teléfono"
+                                    class="w-full p-4 rounded-xl border border-gray-200 bg-gray-50 focus:border-[#00bdd6] focus:ring-2 focus:ring-[#00bdd6]/20 outline-none transition-all">
+                                <input type="email" id="email" required placeholder="Email"
+                                    class="w-full p-4 rounded-xl border border-gray-200 bg-gray-50 focus:border-[#00bdd6] focus:ring-2 focus:ring-[#00bdd6]/20 outline-none transition-all">
+                                <textarea id="proyecto" required placeholder="Consulta o condición física actual..."
+                                    class="w-full p-4 rounded-xl border border-gray-200 bg-gray-50 focus:border-[#00bdd6] focus:ring-2 focus:ring-[#00bdd6]/20 outline-none transition-all h-32 md:col-span-2 resize-none"></textarea>
+                            </div>
+                            <div class="mt-6 flex justify-center">
+                                <button type="submit" class="btn-primary w-full md:w-auto px-10">Enviar
+                                    Solicitud</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="border-t border-soft-grey bg-white py-12">
+            <div class="mx-auto max-w-7xl px-6 lg:px-10">
+                <div class="grid gap-12 lg:grid-cols-4">
+                    <div class="col-span-2 space-y-6">
+                        <span class="brand-text text-professional-grey font-bold">LORENA LLIVIRÍA</span>
+                        <p class="max-w-md text-sm text-professional-grey/70">Transformamos tu postura, transformamos tu
+                            estilo de vida bajo la guía de un experto de la salud.</p>
+                    </div>
+                    <div class="space-y-4">
+                        <h4 class="font-bold text-professional-grey">Contacto Directo</h4>
+                        <ul class="space-y-2 text-sm text-professional-grey/70">
+                            <li class="flex items-center gap-2"><span
+                                    class="material-symbols-outlined text-[#00bdd6] text-base">call</span> +54 9 11 1234
+                                5678 (WhatsApp)</li>
+                            <li class="flex items-center gap-2"><span
+                                    class="material-symbols-outlined text-[#00bdd6] text-base">mail</span>
+                                info@lorenalliviria.com</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Chatbot Container -->
+    <div id="chatbot-container"></div>
+
+    <!-- Notifications Overlay -->
+    <div class="form-notification-overlay" id="form-notification-overlay">
+        <div class="form-notification-card bg-white rounded-2xl p-8 shadow-2xl relative">
+            <button id="notif-close-btn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-800"><i
+                    class="fas fa-times"></i></button>
+            <h3 id="notif-title" class="text-2xl font-bold mb-2 text-professional-grey"></h3>
+            <p id="notif-subtitle" class="text-professional-grey/70"></p>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODALS SECTION                             -->
+    <!-- ========================================== -->
+
+    <!-- Modal: Quiénes Somos (Filosofía) -->
+    <div class="modal-overlay" id="modal-filosofia">
+        <div class="modal-container">
+            <button class="modal-close"><i class="fas fa-times"></i></button>
+            <div class="modal-content text-professional-grey p-4 md:p-8">
+                <h3 class="text-3xl font-black mb-6">Quiénes Somos</h3>
+                <img src="Lorena Lliviria.jpeg" class="w-full h-64 object-cover rounded-xl shadow-lg mb-6"
+                    alt="Lorena Lliviria">
+                <p class="mb-4 text-lg"><strong>Lorena Lliviría Fisioterapia & Pilates</strong> nació en Tacuarembó en
+                    2017 con una misión clara: transformar la salud a través del movimiento consciente.</p>
+                <p class="mb-4 text-gray-600">Desde 2018, te recibimos en nuestro renovado espacio en General Flores
+                    377, un lugar diseñado para que cada persona alcance el máximo potencial de su cuerpo en un ambiente
+                    de calma y profesionalismo.</p>
+                <p class="mb-4 text-gray-600">Fundado y dirigido por la Lic. Lorena Lliviría, nuestro centro se
+                    distingue por ofrecer un servicio donde la fisioterapia y el método Pilates se fusionan bajo una
+                    mirada clínica. Las clases son intervenciones de salud que garantizan seguridad, precisión técnica y
+                    resultados duraderos.</p>
+
+                <h4 class="text-2xl font-bold mt-8 mb-4 text-[#00bdd6]">Nuestra Filosofía</h4>
+                <blockquote class="italic border-l-4 border-[#00bdd6] pl-4 mb-6 text-xl">"Fortalece tu cuerpo desde el
+                    conocimiento, no solo el movimiento."</blockquote>
+                <ul class="list-disc pl-6 space-y-2 text-gray-600 mb-6">
+                    <li>Superar dolores y molestias crónicas con una supervisión constante de la postura.</li>
+                    <li>Esculpir y tonificar tu figura de manera funcional y segura.</li>
+                    <li>Recuperar tu vitalidad y estado de ánimo, priorizando siempre tu capacidad individual.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Pilates -->
+    <div class="modal-overlay" id="modal-pilates">
+        <div class="modal-container">
+            <button class="modal-close"><i class="fas fa-times"></i></button>
+            <div class="modal-content text-professional-grey p-4 md:p-8">
+                <h3 class="text-3xl font-black mb-2">Pilates Clínico</h3>
+                <p class="text-[#00bdd6] font-bold text-lg mb-6">Esculpe, Tonifica y Sana.</p>
+
+                <h4 class="text-xl font-bold mb-2">El Diferencial</h4>
+                <p class="text-gray-600 mb-4">Clases dictadas exclusivamente por una Licenciada en Fisioterapia,
+                    garantizando precisión técnica y seguridad absoluta.</p>
+
+                <h4 class="text-xl font-bold mb-2">El Resultado</h4>
+                <p class="text-gray-600 mb-6">Un cuerpo más esbelto, una postura alineada y músculos definidos sin
+                    riesgo de lesiones.</p>
+
+                <h4 class="text-2xl font-bold text-[#00bdd6] mb-4 mt-8">Nuestros Planes</h4>
+                <div class="bg-soft-grey rounded-xl overflow-hidden border border-gray-200">
+                    <table class="w-full text-left">
+                        <thead class="bg-gray-100 font-bold border-b">
+                            <tr>
+                                <th class="p-4">Frecuencia</th>
+                                <th class="p-4">Inversión Mensual</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-b">
+                                <td class="p-4">1 Vez por semana (4 clases)</td>
+                                <td class="p-4 font-bold text-[#00bdd6]">$ 1.700</td>
+                            </tr>
+                            <tr class="border-b">
+                                <td class="p-4">2 Veces por semana (8 clases)</td>
+                                <td class="p-4 font-bold text-[#00bdd6]">$ 2.500</td>
+                            </tr>
+                            <tr class="border-b">
+                                <td class="p-4">3 Veces por semana (12 clases)</td>
+                                <td class="p-4 font-bold text-[#00bdd6]">$ 3.200</td>
+                            </tr>
+                            <tr>
+                                <td class="p-4">4 Veces por semana (16 clases)</td>
+                                <td class="p-4 font-bold text-[#00bdd6]">$ 3.700</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mt-8">
+                    <h4 class="font-bold mb-2">Tu Proceso de Bienestar Experto</h4>
+                    <ul class="space-y-3 text-gray-600">
+                        <li><strong>1. Evaluación:</strong> Sesión de Valoración Funcional. Plan diseñado para tu
+                            historial funcional.</li>
+                        <li><strong>2. Intervención:</strong> Programas de 8 o 12 sesiones para ver cambios reales.</li>
+                        <li><strong>3. Seguimiento:</strong> Re-evaluaciones y guías para casa.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Fisioterapia -->
+    <div class="modal-overlay" id="modal-fisio">
+        <div class="modal-container">
+            <button class="modal-close"><i class="fas fa-times"></i></button>
+            <div class="modal-content text-professional-grey p-4 md:p-8">
+                <h3 class="text-3xl font-black mb-2">Fisioterapia & Rehabilitación</h3>
+                <p class="text-[#00bdd6] font-bold text-lg mb-6">Tu recuperación funcional en manos expertas.</p>
+
+                <h4 class="text-xl font-bold mb-2">Recuperación de Alto Nivel</h4>
+                <p class="text-gray-600 mb-4">Sanar no significa detenerse. Utilizamos el movimiento como medicina para
+                    reintegrarte a tu vida activa:</p>
+                <ul class="list-disc pl-6 space-y-2 text-gray-600 mb-6">
+                    <li><strong>Columna Sin Dolor:</strong> Especialistas en hernias discales, escoliosis y lumbalgias.
+                        Fortalecemos tu faja natural (core).</li>
+                    <li><strong>Rehabilitación Postquirúrgica:</strong> Protocolos para rodilla, cadera o columna tras
+                        una cirugía.</li>
+                    <li><strong>Suelo Pélvico y Maternidad:</strong> Recuperación postparto y tratamiento de la
+                        incontinencia con delicadeza profesional.</li>
+                </ul>
+
+                <h4 class="text-xl font-bold text-[#00bdd6] mb-2 mt-8">Presupuesto Especializado</h4>
+                <p class="text-gray-600 mb-4">La salud es una inversión personal. Para brindarte la máxima precisión,
+                    realizamos presupuestos personalizados tras una evaluación inicial de nuestra Licenciada.</p>
+                <a href="#contacto" class="btn-primary"
+                    onclick="document.querySelector('#modal-fisio').classList.remove('active');">Solicitar
+                    Evaluación</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Laboral -->
+    <div class="modal-overlay" id="modal-laboral">
+        <div class="modal-container">
+            <button class="modal-close"><i class="fas fa-times"></i></button>
+            <div class="modal-content text-professional-grey p-4 md:p-8">
+                <h3 class="text-3xl font-black mb-2">Gimnasia Laboral</h3>
+                <p class="text-[#00bdd6] font-bold text-lg mb-6">Cuidamos la salud de tu equipo para potenciar el
+                    rendimiento.</p>
+
+                <h4 class="text-xl font-bold mb-2">El Diferencial</h4>
+                <p class="text-gray-600 mb-4">Programas diseñados para empresas que buscan prevenir lesiones laborales y
+                    reducir el estrés del equipo mediante el movimiento guiado.</p>
+
+                <h4 class="text-xl font-bold mb-2">El Resultado</h4>
+                <p class="text-gray-600 mb-6">Reducción de dolores posturales por oficina, aumento de la energía y
+                    mejora del clima laboral.</p>
+
+                <h4 class="text-xl font-bold text-[#00bdd6] mb-2 mt-8">Presupuestación a Medida</h4>
+                <p class="text-gray-600 mb-4">Desarrollamos una intervención de salud técnica y precisa según las
+                    dinámicas y estructura de tu empresa.</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
