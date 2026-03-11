@@ -361,7 +361,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     form.reset();
                     
                     // Trigger Premium Notification
-                    showNotification('¡Solicitud Enviada!', 'Has enviado tu consulta con éxito. Me comunicaré a la brevedad.');
+                    showNotification('Solicitud enviada con éxito', 'Lo estaremos contactando a la brevedad.');
                     
                     // Trigger Confetti (like Nico Labs)
                     if (typeof confetti === 'function') {
