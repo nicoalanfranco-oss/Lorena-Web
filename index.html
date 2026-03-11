@@ -511,15 +511,21 @@
 
     <!-- Notifications Overlay -->
     <div class="form-notification-overlay" id="form-notification-overlay">
-        <div class="form-notification-card glass-panel-premium">
-            <button id="notif-close-btn" class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors">
+        <div class="form-notification-card glass-panel-premium-compact">
+            <button id="notif-close-btn" class="absolute top-4 right-4 text-gray-400 hover:text-[#00bdd6] transition-colors">
                 <span class="material-symbols-outlined">close</span>
             </button>
             <div class="flex flex-col items-center text-center">
-                <img src="Logo Lorena.png" alt="Lorena Lliviría" class="h-20 mb-6 drop-shadow-xl">
-                <h3 id="notif-title" class="text-3xl font-black mb-3 text-professional-grey"></h3>
-                <p id="notif-subtitle" class="text-professional-grey/80 text-lg max-w-sm"></p>
-                <div class="mt-8 h-1 w-20 bg-gradient-to-r from-[#00bdd6] to-transparent rounded-full"></div>
+                <div class="success-icon-container mb-4">
+                    <span class="material-symbols-outlined text-5xl text-[#4ade80] animate-check">check_circle</span>
+                </div>
+                <img src="Logo Lorena.png" alt="Lorena Lliviría" class="h-12 mb-4 drop-shadow-lg">
+                <h3 id="notif-title" class="text-xl font-black mb-2 text-professional-grey"></h3>
+                <p id="notif-subtitle" class="text-professional-grey/80 text-sm max-w-[280px]"></p>
+                <div class="mt-6 flex gap-1 justify-center">
+                    <span class="h-1 w-6 bg-[#00bdd6] rounded-full"></span>
+                    <span class="h-1 w-12 bg-[#00bdd6]/30 rounded-full"></span>
+                </div>
             </div>
         </div>
     </div>

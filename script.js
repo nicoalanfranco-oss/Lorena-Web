@@ -325,7 +325,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 telefono: document.getElementById('telefono').value,
                 email: document.getElementById('email').value,
                 proyecto: document.getElementById('proyecto').value,
-                cliente: 'lorenalliviria' // Identificador para n8n
+                cliente: 'lorenalliviria', // Identificador para n8n
+                fuente: 'WEB' // Tracking para nicolabs parity
             };
 
             try {
