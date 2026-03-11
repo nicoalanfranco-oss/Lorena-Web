@@ -406,9 +406,9 @@ header {
    ============================================ */
 #chatbot-container {
     position: fixed;
-    bottom: 30px;
-    right: 30px;
-    z-index: 9999;
+    bottom: 35px;
+    right: 35px;
+    z-index: 1000000;
 }
 
 #chatbot-container.chat-active .chat-toggle {
@@ -432,6 +432,10 @@ header {
     transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
     position: relative;
     z-index: 9999;
+}
+
+.chat-toggle > * {
+    pointer-events: none;
 }
 
 /* Pulsing outer ring (Signal of Life) */
