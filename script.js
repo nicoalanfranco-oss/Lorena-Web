@@ -264,7 +264,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (response.ok) {
                     form.reset();
+                    
+                    // Trigger Premium Notification
                     showNotification('¡Solicitud Enviada!', 'Has enviado tu consulta con éxito. Me comunicaré a la brevedad.');
+                    
+                    // Trigger Confetti (like Nico Labs)
+                    if (typeof confetti === 'function') {
+                        confetti({
+                            particleCount: 150,
+                            spread: 70,
+                            origin: { y: 0.6 },
+                            colors: ['#00bdd6', '#ffffff', '#2d2d2d']
+                        });
+                    }
                 } else {
                     throw new Error('Error en el servidor');
                 }
