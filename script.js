@@ -108,13 +108,31 @@ document.addEventListener('DOMContentLoaded', () => {
             chatToggle.style.transform = 'scale(1) rotate(0deg)';
         }, 1500);
 
+        // Generate or retrieve a unique session ID for this conversation
+        if (!sessionStorage.getItem('lorena_session_id')) {
+            sessionStorage.setItem('lorena_session_id', 'session-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9));
+        }
+        const SESSION_ID = sessionStorage.getItem('lorena_session_id');
+
+        let originalScrollY = 0;
+
         function toggleChat() {
-            const isActive = chatWidget.classList.contains('active');
-            if (!isActive) {
-                chatWidget.classList.add('active');
-                chatbotContainer.classList.add('chat-active');
+            chatWidget.classList.toggle('active');
+            chatbotContainer.classList.toggle('chat-active');
+            
+            if (chatWidget.classList.contains('active')) {
                 history.pushState({ chatOpen: true }, '');
-                setTimeout(() => chatInput.focus(), 50);
+                if (window.innerWidth <= 768) {
+                    // Lock body to prevent scrolling when chat is fixed
+                    originalScrollY = window.scrollY;
+                    document.body.style.position = 'fixed';
+                    document.body.style.top = `-${originalScrollY}px`;
+                    document.body.style.width = '100%';
+                    // Sync height for mobile keyboard
+                    setTimeout(adjustChatHeight, 50);
+                } else {
+                    chatInput.focus();
+                }
             } else {
                 closeChatUI();
                 if (history.state && history.state.chatOpen) history.back();
@@ -124,16 +142,34 @@ document.addEventListener('DOMContentLoaded', () => {
         function closeChatUI() {
             chatWidget.classList.remove('active');
             chatbotContainer.classList.remove('chat-active');
+            if (window.innerWidth <= 768) {
+                document.body.style.position = '';
+                document.body.style.top = '';
+                document.body.style.width = '';
+                window.scrollTo(0, originalScrollY);
+            }
         }
 
-        // Generic back button handler (handles modals and chat)
+        function adjustChatHeight() {
+            if (window.innerWidth <= 768 && chatWidget.classList.contains('active')) {
+                let vh = window.innerHeight;
+                if (window.visualViewport) vh = window.visualViewport.height;
+                chatWidget.style.height = `${vh}px`;
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                window.scrollTo(0, 0);
+            }
+        }
+
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', adjustChatHeight);
+            window.visualViewport.addEventListener('scroll', () => {
+                if (chatWidget.classList.contains('active')) window.scrollTo(0, 0);
+            });
+        }
+
         window.addEventListener('popstate', (e) => {
             if (chatWidget.classList.contains('active')) closeChatUI();
-
-            // Close any active modal
-            document.querySelectorAll('.modal-overlay.active').forEach(modal => {
-                modal.classList.remove('active');
-            });
+            document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active'));
         });
 
         // Close active modal or chat on Escape key press
@@ -155,31 +191,90 @@ document.addEventListener('DOMContentLoaded', () => {
         chatToggle.addEventListener('click', toggleChat);
         chatClose.addEventListener('click', toggleChat);
 
-        // Dummy send logic
-        chatSend.addEventListener('click', () => {
+        async function sendMessage() {
             const text = chatInput.value.trim();
             if (!text) return;
 
-            chatMessages.innerHTML += `<div class="message user">${text}</div>`;
+            addMessage(text, 'user');
             chatInput.value = '';
+            const typingId = addTypingIndicator();
+
+            try {
+                const response = await fetch('https://n8n.nico-family.com/webhook/3b1ec272-8ba1-4e6f-abf5-a9d567a6e28a/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chatInput: text,
+                        sessionId: SESSION_ID,
+                        cliente: 'lorenalliviria',
+                        fuente: 'WEB'
+                    })
+                });
+
+                const rawText = await response.text();
+                removeMessage(typingId);
+
+                if (!response.ok) {
+                    addMessage('Lo siento, hubo un error de conexión.', 'bot');
+                    return;
+                }
+
+                let botReply = '';
+                if (rawText) {
+                    try {
+                        const parsed = JSON.parse(rawText);
+                        botReply = (Array.isArray(parsed) ? (parsed[0].output || parsed[0].text) : (parsed.output || parsed.text)) || rawText;
+                    } catch (e) {
+                        // NDJSON or Plain Text
+                        const lines = rawText.split('\n').filter(l => l.trim() !== '');
+                        let combined = '';
+                        let isNdjson = false;
+                        for (const l of lines) {
+                            try {
+                                const p = JSON.parse(l);
+                                if (p.type === 'item' && p.content) { combined += p.content; isNdjson = true; }
+                            } catch (err) {}
+                        }
+                        botReply = (isNdjson && combined) ? combined : rawText;
+                    }
+                }
+
+                // Generic trace stripping (like Nico Labs)
+                botReply = botReply.replace(/Calling\s+[\w-]+\s+with\s+input:\s*\{[^{}]*\}/g, '').trim();
+                addMessage(botReply, 'bot');
+
+            } catch (error) {
+                removeMessage(typingId);
+                addMessage('Error al conectar con Loreley.', 'bot');
+            }
+        }
+
+        chatSend.addEventListener('click', sendMessage);
+        chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
+
+        function addMessage(text, sender) {
+            const div = document.createElement('div');
+            div.classList.add('message', sender);
+            div.textContent = text;
+            chatMessages.appendChild(div);
             chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
 
-            // Typing indicator
-            const typingId = 'type-' + Date.now();
-            chatMessages.innerHTML += `<div class="message bot typing" id="${typingId}"><span></span><span></span><span></span></div>`;
+        function addTypingIndicator() {
+            const div = document.createElement('div');
+            const id = 'typing-' + Date.now();
+            div.id = id;
+            div.classList.add('message', 'bot', 'typing');
+            div.innerHTML = '<span></span><span></span><span></span>';
+            chatMessages.appendChild(div);
             chatMessages.scrollTop = chatMessages.scrollHeight;
+            return id;
+        }
 
-            setTimeout(() => {
-                const tr = document.getElementById(typingId);
-                if (tr) tr.remove();
-                chatMessages.innerHTML += `<div class="message bot">Gracias por tu mensaje. El chat automático se encuentra en etapa de prueba para Lorena Web. Por favor utiliza el formulario de contacto para comunicarte de manera oficial.</div>`;
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            }, 1500);
-        });
-
-        chatInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') chatSend.click();
-        });
+        function removeMessage(id) {
+            const el = document.getElementById(id);
+            if (el) el.remove();
+        }
     }
 
     // --- Modals Logic ---
