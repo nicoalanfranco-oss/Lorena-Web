@@ -69,35 +69,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const chatbotContainer = document.getElementById('chatbot-container');
 
     if (chatbotContainer) {
-        chatbotContainer.innerHTML = `
-            <div class="chat-widget" id="chat-widget">
-                <div class="chat-header">
-                    <div class="chat-title">
-                         <i class="fas fa-robot"></i> Asistente Virtual
-                    </div>
-                    <button class="chat-close" id="chat-close"><i class="fas fa-times"></i></button>
-                </div>
-                <div class="chat-messages" id="chat-messages">
-                    <div class="message bot">
-                        Hola, soy el asistente virtual de Lorena Lliviría. ¿En qué puedo ayudarte con nuestros servicios de Pilates y Fisioterapia?
-                    </div>
-                </div>
-                <div class="chat-input-area">
-                    <input type="text" id="chat-input" placeholder="Escribe tu mensaje...">
-                    <button id="chat-send"><i class="fas fa-paper-plane"></i></button>
-                </div>
-            </div>
-            <button class="chat-toggle" id="chat-toggle">
-                <i class="fas fa-comment-dots"></i>
-            </button>
-        `;
-
         const chatToggle = document.getElementById('chat-toggle');
         const chatWidget = document.getElementById('chat-widget');
         const chatClose = document.getElementById('chat-close');
         const chatInput = document.getElementById('chat-input');
         const chatSend = document.getElementById('chat-send');
         const chatMessages = document.getElementById('chat-messages');
+
+        if (!chatToggle || !chatWidget) return;
+
 
         // Intro animation for the toggle
         chatToggle.style.opacity = '0';
