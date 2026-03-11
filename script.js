@@ -235,9 +235,37 @@ document.addEventListener('DOMContentLoaded', () => {
         function addMessage(text, sender) {
             const div = document.createElement('div');
             div.classList.add('message', sender);
-            div.textContent = text;
+            
+            if (sender === 'bot') {
+                div.innerHTML = formatMessage(text);
+            } else {
+                div.textContent = text;
+            }
+            
             chatMessages.appendChild(div);
             chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function formatMessage(text) {
+            if (!text) return '';
+            
+            // Generic cleaning
+            let html = text.trim();
+            
+            // Bold
+            html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            
+            // Italic
+            html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+            
+            // Lists (simple)
+            html = html.replace(/^\s*-\s+(.*)$/gm, '<li>$1</li>');
+            html = html.replace(/(<li>.*<\/li>)/s, '<ul class="chat-list">$1</ul>');
+            
+            // Line breaks
+            html = html.replace(/\n/g, '<br>');
+            
+            return html;
         }
 
         function addTypingIndicator() {
@@ -294,19 +322,24 @@ document.addEventListener('DOMContentLoaded', () => {
     setupModal('#card-laboral', 'modal-laboral');
 
     // --- Form & Notifications ---
-    const notifOverlay = document.getElementById('form-notification-overlay');
-    const notifClose = document.getElementById('notif-close-btn');
-
+    let notifTimeout;
     function showNotification(title, text) {
         if (notifOverlay) {
             document.getElementById('notif-title').innerText = title;
             document.getElementById('notif-subtitle').innerText = text;
             notifOverlay.classList.add('active');
+
+            // Auto-close after 3 seconds
+            if (notifTimeout) clearTimeout(notifTimeout);
+            notifTimeout = setTimeout(() => {
+                notifOverlay.classList.remove('active');
+            }, 3000);
         }
     }
 
     if (notifClose) notifClose.addEventListener('click', () => {
         notifOverlay.classList.remove('active');
+        if (notifTimeout) clearTimeout(notifTimeout);
     });
 
     const form = document.getElementById('contact-form');
