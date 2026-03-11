@@ -236,19 +236,45 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const form = document.getElementById('contact-form');
     if (form) {
-        form.addEventListener('submit', (e) => {
+        form.addEventListener('submit', async (e) => {
             e.preventDefault();
+            
             const btn = form.querySelector('button');
             const origText = btn.innerText;
             btn.innerText = 'Enviando...';
             btn.disabled = true;
 
-            setTimeout(() => {
-                form.reset();
-                showNotification('¡Solicitud Enviada!', 'Has enviado tu consulta con éxito. Me comunicaré a la brevedad.');
+            const formData = {
+                nombre: document.getElementById('nombre').value,
+                apellido: document.getElementById('apellido').value,
+                telefono: document.getElementById('telefono').value,
+                email: document.getElementById('email').value,
+                proyecto: document.getElementById('proyecto').value,
+                cliente: 'lorenalliviria' // Identificador para n8n
+            };
+
+            try {
+                const response = await fetch('https://n8n.nico-family.com/webhook/a1e59b22-4770-43dc-b4bd-42186903cfd4', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (response.ok) {
+                    form.reset();
+                    showNotification('¡Solicitud Enviada!', 'Has enviado tu consulta con éxito. Me comunicaré a la brevedad.');
+                } else {
+                    throw new Error('Error en el servidor');
+                }
+            } catch (error) {
+                console.error('Error al enviar el formulario:', error);
+                showNotification('Error', 'Hubo un problema al enviar tu solicitud. Por favor intenta nuevamente o contactame por WhatsApp.');
+            } finally {
                 btn.innerText = origText;
                 btn.disabled = false;
-            }, 1500);
+            }
         });
     }
 
