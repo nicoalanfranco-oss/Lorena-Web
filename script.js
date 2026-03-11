@@ -322,6 +322,9 @@ document.addEventListener('DOMContentLoaded', () => {
     setupModal('#card-laboral', 'modal-laboral');
 
     // --- Form & Notifications ---
+    const notifOverlay = document.getElementById('form-notification-overlay');
+    const notifClose = document.getElementById('notif-close-btn');
+    
     let notifTimeout;
     function showNotification(title, text) {
         if (notifOverlay) {
