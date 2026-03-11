@@ -136,6 +136,22 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
+        // Close active modal or chat on Escape key press
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                if (chatWidget.classList.contains('active')) {
+                    closeChatUI();
+                    if (history.state && history.state.chatOpen) history.back();
+                }
+
+                const activeModals = document.querySelectorAll('.modal-overlay.active');
+                if (activeModals.length > 0) {
+                    activeModals.forEach(modal => modal.classList.remove('active'));
+                    if (history.state && history.state.modalOpen) history.back();
+                }
+            }
+        });
+
         chatToggle.addEventListener('click', toggleChat);
         chatClose.addEventListener('click', toggleChat);
 
@@ -235,4 +251,22 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 1500);
         });
     }
+
+    // Logo Stamp Animation Trigger on Scroll
+    const stampBoxes = document.querySelectorAll('.acrylic-stamp-box');
+    const stampObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                // Add class to trigger CSS animations
+                entry.target.classList.add('animate-stamp');
+            } else {
+                // Remove class when out of view to allow re-triggering when scrolling back
+                entry.target.classList.remove('animate-stamp');
+            }
+        });
+    }, {
+        threshold: 0.6 // Trigger when 60% of the box is visible for better effect
+    });
+
+    stampBoxes.forEach(box => stampObserver.observe(box));
 });

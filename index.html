@@ -7,8 +7,7 @@
     <title>Lorena Lliviría - Pilates &amp; Fisioterapia</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&display=swap"
-        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 
@@ -64,10 +63,10 @@
             </nav>
         </header>
 
-        <main class="flex-grow pt-20">
+        <main class="flex-grow">
             <!-- Hero Section -->
             <section id="hero" class="hero-section"
-                style="background-image: url('LorePilates.jpeg'); background-size: cover; background-position: center;">
+                style="background-image: url('LorePilates.jpeg'); background-size: cover; background-position: center top;">
                 <div class="hero-overlay"></div>
                 <div class="hero-content">
                     <h1 class="hero-title">Bienestar Guiado <br />por <span class="gradient-text">Expertos</span></h1>
@@ -83,14 +82,20 @@
             </section>
 
             <!-- Integral Approach Section -->
-            <section class="py-24 bg-white" id="enfoque">
-                <div class="mx-auto max-w-7xl px-6 lg:px-10">
-                    <div class="grid items-center gap-16 lg:grid-cols-2">
-                        <div class="space-y-8 reveal-left">
+            <section class="py-24 bg-soft-grey relative" id="enfoque">
+                <!-- Background decorative elements for premium feel -->
+                <div class="absolute inset-0 overflow-hidden pointer-events-none">
+                    <div class="absolute -top-1/4 -right-1/4 w-1/2 h-1/2 bg-[#00bdd6] opacity-[0.03] blur-[100px] rounded-full"></div>
+                    <div class="absolute -bottom-1/4 -left-1/4 w-1/2 h-1/2 bg-[#00bdd6] opacity-[0.03] blur-[100px] rounded-full"></div>
+                </div>
+                <div class="mx-auto max-w-7xl px-6 lg:px-10 relative z-10">
+                    <div class="grid items-stretch gap-8 lg:grid-cols-2 relative">
+                        <!-- Box 1 -->
+                        <div class="space-y-8 reveal-left glass-panel-premium flex flex-col justify-between">
                             <div>
                                 <h2 class="text-sm font-bold uppercase tracking-widest text-[#00bdd6]">Pilates con el
                                     Cuidado de la Fisioterapia</h2>
-                                <h3 class="mt-2 text-4xl font-black text-professional-grey">Un Enfoque Integral para tu
+                                <h3 class="mt-2 text-3xl font-black text-professional-grey">Un Enfoque Integral para tu
                                     Bienestar</h3>
                                 <p class="mt-4 text-lg text-professional-grey/70">La combinación de Pilates y
                                     Fisioterapia es mucho más que una tendencia; es la estrategia más efectiva para
@@ -100,43 +105,50 @@
                                     Pilates, creemos en el bienestar guiado por expertos. Por eso, nuestras sesiones no
                                     son solo movimiento, sino una intervención de salud integral.</p>
                             </div>
-                            <button id="btn-filosofia" class="btn-secondary mt-4">Nuestra Filosofía</button>
+                            <div class="mt-auto pt-4 border-t border-gray-100/50">
+                                <button id="btn-filosofia" class="btn-secondary mt-4">Nuestra Filosofía</button>
+                            </div>
                         </div>
-                        <div class="space-y-6 reveal-right">
-                            <h4 class="font-black text-2xl text-professional-grey border-b border-soft-grey pb-4">¿Qué
-                                hace diferente a nuestro método?</h4>
-
-                            <div class="flex items-start gap-4 hover:translate-x-2 transition-transform cursor-default">
-                                <div
-                                    class="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-soft-grey text-[#00bdd6] shadow-sm">
-                                    <span class="material-symbols-outlined">shield</span>
-                                </div>
-                                <div>
-                                    <h4 class="font-bold text-professional-grey">Seguridad Absoluta</h4>
-                                    <p class="text-sm text-professional-grey/70">Cada movimiento es supervisado con ojo
-                                        clínico para evitar lesiones.</p>
-                                </div>
+                        <!-- Box 2 -->
+                        <div class="space-y-6 reveal-right glass-panel-premium flex flex-col justify-between">
+                            <div>
+                                <h2 class="text-sm font-bold uppercase tracking-widest text-[#00bdd6] hidden md:block opacity-0">Diferencial</h2>
+                                <h3 class="mt-2 md:-mt-6 text-3xl font-black text-professional-grey border-b border-gray-100/50 pb-4">¿Qué
+                                    hace diferente a nuestro método?</h3>
                             </div>
-                            <div class="flex items-start gap-4 hover:translate-x-2 transition-transform cursor-default">
-                                <div
-                                    class="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-soft-grey text-[#00bdd6] shadow-sm">
-                                    <span class="material-symbols-outlined">api</span>
+                            <div class="flex-grow flex flex-col justify-center space-y-8 -mt-2">
+                                <div class="flex items-start gap-4 hover:translate-x-2 transition-transform cursor-default">
+                                    <div
+                                        class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white/70 text-[#00bdd6] shadow-sm backdrop-blur-md border border-white">
+                                        <span class="material-symbols-outlined">shield</span>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-professional-grey text-lg">Seguridad Absoluta</h4>
+                                        <p class="text-sm text-professional-grey/70">Cada movimiento es supervisado con ojo
+                                            clínico para evitar lesiones.</p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <h4 class="font-bold text-professional-grey">Precisión Técnica</h4>
-                                    <p class="text-sm text-professional-grey/70">Ajustes específicos basados en tu
-                                        anatomía y patologías previas.</p>
+                                <div class="flex items-start gap-4 hover:translate-x-2 transition-transform cursor-default">
+                                    <div
+                                        class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white/70 text-[#00bdd6] shadow-sm backdrop-blur-md border border-white">
+                                        <span class="material-symbols-outlined">api</span>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-professional-grey text-lg">Precisión Técnica</h4>
+                                        <p class="text-sm text-professional-grey/70">Ajustes específicos basados en tu
+                                            anatomía y patologías previas.</p>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="flex items-start gap-4 hover:translate-x-2 transition-transform cursor-default">
-                                <div
-                                    class="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-soft-grey text-[#00bdd6] shadow-sm">
-                                    <span class="material-symbols-outlined">accessibility_new</span>
-                                </div>
-                                <div>
-                                    <h4 class="font-bold text-professional-grey">Enfoque en el Core</h4>
-                                    <p class="text-sm text-professional-grey/70">Trabajo profundo de la musculatura
-                                        abdominal, lumbar y del suelo pélvico para estabilizar.</p>
+                                <div class="flex items-start gap-4 hover:translate-x-2 transition-transform cursor-default">
+                                    <div
+                                        class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white/70 text-[#00bdd6] shadow-sm backdrop-blur-md border border-white">
+                                        <span class="material-symbols-outlined">accessibility_new</span>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-professional-grey text-lg">Enfoque en el Core</h4>
+                                        <p class="text-sm text-professional-grey/70">Trabajo profundo de la musculatura
+                                            abdominal, lumbar y del suelo pélvico para estabilizar.</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -358,6 +370,12 @@
                                     profundizar en el movimiento, ofreciéndote soporte, conciencia y un nuevo nivel de
                                     conexión contigo misma. Es tu momento, es tu cuidado."</p>
                             </div>
+                        </div>
+
+                        <!-- Logo Stamp Acrylic Box -->
+                        <div class="tip-card acrylic-stamp-box rounded-2xl relative flex items-center justify-center p-8 h-64 md:h-80 w-full overflow-hidden group">
+                             <div class="absolute inset-0 bg-gradient-to-br from-white/60 to-white/10 opacity-50 pointer-events-none group-hover:opacity-80 transition-opacity duration-700"></div>
+                             <img src="Logo Lorena.png" alt="Lorena Lliviría Logo Premium" class="stamp-logo relative z-10">
                         </div>
                     </div>
                     <div class="text-center mt-12 mb-8 italic text-lg text-[#00bdd6] font-medium reveal-bottom">
