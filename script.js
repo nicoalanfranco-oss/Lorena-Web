@@ -423,22 +423,38 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Contact Tooltip Trigger Logic ---
     const contactSection = document.getElementById('contacto');
     const chatTooltip = document.getElementById('chat-tooltip');
-    let hasShownTooltip = false;
+    let hasShownTooltipContact = false;
+    let tooltipTimeout;
 
+    function showChatTooltip() {
+        if (!chatTooltip) return;
+        
+        // Clear any existing timeout to avoid hiding prematurely if triggered twice
+        if (tooltipTimeout) clearTimeout(tooltipTimeout);
+
+        // Show tooltip
+        chatTooltip.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4', 'scale-95');
+        chatTooltip.classList.add('opacity-100', 'translate-y-0', 'scale-100');
+        
+        // Hide automatically after 6 seconds
+        tooltipTimeout = setTimeout(() => {
+            chatTooltip.classList.remove('opacity-100', 'translate-y-0', 'scale-100');
+            chatTooltip.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4', 'scale-95');
+        }, 6000);
+    }
+
+    // Trigger 1: Shortly after page load (chat icon animation is 1500ms)
+    setTimeout(() => {
+        showChatTooltip();
+    }, 2500);
+
+    // Trigger 2: When reaching contact section
     if (contactSection && chatTooltip) {
         const contactObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
-                if (entry.isIntersecting && !hasShownTooltip) {
-                    hasShownTooltip = true;
-                    // Show tooltip
-                    chatTooltip.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4', 'scale-95');
-                    chatTooltip.classList.add('opacity-100', 'translate-y-0', 'scale-100');
-                    
-                    // Hide automatically after 6 seconds
-                    setTimeout(() => {
-                        chatTooltip.classList.remove('opacity-100', 'translate-y-0', 'scale-100');
-                        chatTooltip.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4', 'scale-95');
-                    }, 6000);
+                if (entry.isIntersecting && !hasShownTooltipContact) {
+                    hasShownTooltipContact = true;
+                    showChatTooltip();
                 }
             });
         }, { threshold: 0.3 }); // Trigger when 30% of contact section is visible
