@@ -419,4 +419,30 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     stampBoxes.forEach(box => stampObserver.observe(box));
+
+    // --- Contact Tooltip Trigger Logic ---
+    const contactSection = document.getElementById('contacto');
+    const chatTooltip = document.getElementById('chat-tooltip');
+    let hasShownTooltip = false;
+
+    if (contactSection && chatTooltip) {
+        const contactObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && !hasShownTooltip) {
+                    hasShownTooltip = true;
+                    // Show tooltip
+                    chatTooltip.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4', 'scale-95');
+                    chatTooltip.classList.add('opacity-100', 'translate-y-0', 'scale-100');
+                    
+                    // Hide automatically after 6 seconds
+                    setTimeout(() => {
+                        chatTooltip.classList.remove('opacity-100', 'translate-y-0', 'scale-100');
+                        chatTooltip.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4', 'scale-95');
+                    }, 6000);
+                }
+            });
+        }, { threshold: 0.3 }); // Trigger when 30% of contact section is visible
+
+        contactObserver.observe(contactSection);
+    }
 });
