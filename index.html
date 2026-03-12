@@ -17,6 +17,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <!-- Firebase SDK (Version compat para simplificar integración directa) -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
     <script id="tailwind-config">
         tailwind.config = {
@@ -411,44 +415,10 @@
                                             <th class="p-4 border-b">Turno PM</th>
                                         </tr>
                                     </thead>
-                                    <tbody class="text-professional-grey/80">
-                                        <tr class="border-b">
-                                            <td class="p-4 font-semibold">Lunes</td>
-                                            <td class="p-4">--</td>
-                                            <td class="p-4">
-                                                <div class="text-[#00bdd6] font-bold">15:00 a 18:00</div>
-                                                <div class="text-[10px] sm:text-xs text-professional-grey/60 mt-1 leading-tight">*Horarios de inicio. Cierre 19:00 hs.</div>
-                                            </td>
-                                        </tr>
-                                        <tr class="border-b bg-gray-50/50">
-                                            <td class="p-4 font-semibold">Martes</td>
-                                            <td class="p-4">
-                                                <div class="text-[#00bdd6] font-bold">08:00 a 09:00</div>
-                                                <div class="text-[10px] sm:text-xs text-professional-grey/60 mt-1 leading-tight">*Horarios de inicio. Cierre 10:00 hs.</div>
-                                            </td>
-                                            <td class="p-4">
-                                                <div class="text-[#00bdd6] font-bold">15:00 a 18:00</div>
-                                                <div class="text-[10px] sm:text-xs text-professional-grey/60 mt-1 leading-tight">*Horarios de inicio. Cierre 19:00 hs.</div>
-                                            </td>
-                                        </tr>
-                                        <tr class="border-b">
-                                            <td class="p-4 font-semibold">Miércoles</td>
-                                            <td class="p-4">--</td>
-                                            <td class="p-4">
-                                                <div class="text-[#00bdd6] font-bold">15:00 a 18:00</div>
-                                                <div class="text-[10px] sm:text-xs text-professional-grey/60 mt-1 leading-tight">*Horarios de inicio. Cierre 19:00 hs.</div>
-                                            </td>
-                                        </tr>
+                                    <tbody id="horarios-dynamic-container" class="text-professional-grey/80">
+                                        <!-- Los horarios se cargarán dinámicamente desde Firestore -->
                                         <tr>
-                                            <td class="p-4 font-semibold">Jueves</td>
-                                            <td class="p-4">
-                                                <div class="text-[#00bdd6] font-bold">08:00 a 09:00</div>
-                                                <div class="text-[10px] sm:text-xs text-professional-grey/60 mt-1 leading-tight">*Horarios de inicio. Cierre 10:00 hs.</div>
-                                            </td>
-                                            <td class="p-4">
-                                                <div class="text-[#00bdd6] font-bold">15:00 a 18:00</div>
-                                                <div class="text-[10px] sm:text-xs text-professional-grey/60 mt-1 leading-tight">*Horarios de inicio. Cierre 19:00 hs.</div>
-                                            </td>
+                                            <td colspan="3" class="p-8 text-center text-professional-grey/40 italic">Cargando horarios actualizados...</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -612,22 +582,10 @@
                                 <th class="p-4">Inversión Mensual</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr class="border-b">
-                                <td class="p-4">1 Vez por semana (4 clases)</td>
-                                <td class="p-4 font-bold text-[#00bdd6]">$ 1.700</td>
-                            </tr>
-                            <tr class="border-b">
-                                <td class="p-4">2 Veces por semana (8 clases)</td>
-                                <td class="p-4 font-bold text-[#00bdd6]">$ 2.500</td>
-                            </tr>
-                            <tr class="border-b">
-                                <td class="p-4">3 Veces por semana (12 clases)</td>
-                                <td class="p-4 font-bold text-[#00bdd6]">$ 3.200</td>
-                            </tr>
+                        <tbody id="precios-dynamic-container">
+                            <!-- Los precios se cargarán dinámicamente -->
                             <tr>
-                                <td class="p-4">4 Veces por semana (16 clases)</td>
-                                <td class="p-4 font-bold text-[#00bdd6]">$ 3.700</td>
+                                <td colspan="2" class="p-8 text-center text-professional-grey/40 italic">Cargando planes vigentes...</td>
                             </tr>
                         </tbody>
                     </table>

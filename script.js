@@ -1,5 +1,101 @@
 document.addEventListener('DOMContentLoaded', () => {
 
+    // --- Firebase & Sync Logic ---
+    const firebaseConfig = {
+        projectId: "studio-4748759464-52942",
+        appId: "1:713780303554:web:56ea6589fa0c00217b4d5b",
+        storageBucket: "studio-4748759464-52942.firebasestorage.app",
+        apiKey: "AIzaSyAgB9JBpuNWvEVU5uR5k41IVKKFhVlpo-w",
+        authDomain: "studio-4748759464-52942.firebaseapp.com",
+        messagingSenderId: "713780303554"
+    };
+
+    // Inicializar Firebase si los scripts están cargados
+    if (typeof firebase !== 'undefined') {
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Escuchar cambios en tiempo real en Firestore
+        // El documento 'public_data' será actualizado por n8n basado en studio-main
+        db.collection('web_config').doc('public_data').onSnapshot((doc) => {
+            if (doc.exists) {
+                const data = doc.data();
+                renderDynamicSchedules(data.horarios || []);
+                renderDynamicPrices(data.precios || []);
+            }
+        }, (error) => {
+            console.error("Error escuchando Firestore:", error);
+            renderFallbacks();
+        });
+    }
+
+    function renderDynamicSchedules(horarios) {
+        const container = document.getElementById('horarios-dynamic-container');
+        if (!container) return;
+
+        if (horarios.length === 0) {
+            container.innerHTML = '<tr><td colspan="3" class="p-8 text-center">No hay horarios disponibles.</td></tr>';
+            return;
+        }
+
+        // Agrupar por día para armar la tabla
+        const diasSemana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+        let html = '';
+
+        diasSemana.forEach((dia, index) => {
+            const horariosDia = horarios.filter(h => h.nombre_dia === dia);
+            if (horariosDia.length === 0 && index > 3) return; // Omitir viernes/fin de semana si no hay nada
+
+            const am = horariosDia.find(h => parseInt(h.hora.split(':')[0]) < 12);
+            const pm = horariosDia.filter(h => parseInt(h.hora.split(':')[0]) >= 12);
+
+            html += `<tr class="border-b ${index % 2 !== 0 ? 'bg-gray-50/50' : ''}">
+                <td class="p-4 font-semibold">${dia}</td>
+                <td class="p-4">${am ? `
+                    <div class="text-[#00bdd6] font-bold">${am.hora.substring(0, 5)} a ${calcularFin(am.hora, am.duracion_min)}</div>
+                    <div class="text-[10px] sm:text-xs text-professional-grey/60 mt-1 leading-tight">*Horario de inicio.</div>
+                ` : '--'}</td>
+                <td class="p-4">${pm.length > 0 ? pm.map(p => `
+                    <div class="mb-2 last:mb-0">
+                        <div class="text-[#00bdd6] font-bold">${p.hora.substring(0, 5)} hs</div>
+                        <div class="text-[10px] sm:text-xs text-professional-grey/60 leading-tight">*Inicio. Duración ${p.duracion_min}m</div>
+                    </div>
+                `).join('') : '--'}</td>
+            </tr>`;
+        });
+
+        container.innerHTML = html;
+    }
+
+    function renderDynamicPrices(precios) {
+        const container = document.getElementById('precios-dynamic-container');
+        if (!container) return;
+
+        if (precios.length === 0) {
+            container.innerHTML = '<tr><td colspan="2" class="p-8 text-center">Consultar precios por privado.</td></tr>';
+            return;
+        }
+
+        container.innerHTML = precios.map((p, i) => `
+            <tr class="${i < precios.length - 1 ? 'border-b' : ''}">
+                <td class="p-4">${p.modalidad}</td>
+                <td class="p-4 font-bold text-[#00bdd6]">$ ${Math.round(p.ultimo_precio).toLocaleString('es-UY')}</td>
+            </tr>
+        `).join('');
+    }
+
+    function calcularFin(horaStr, duracionMin) {
+        const [h, m] = horaStr.split(':').map(Number);
+        const date = new Date();
+        date.setHours(h, m + duracionMin);
+        return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+    }
+
+    function renderFallbacks() {
+        // En caso de error, podríamos poner los valores estáticos por defecto
+        console.log("Cargando fallbacks por error de conexión.");
+    }
+
     // Custom Cursor (Desktop Only)
     const cursorDot = document.querySelector('.cursor-dot');
     const cursorOutline = document.querySelector('.cursor-outline');
