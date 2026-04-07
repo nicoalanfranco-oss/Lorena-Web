@@ -185,10 +185,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 1500);
 
         // Generate or retrieve a unique session ID for this conversation
-        if (!sessionStorage.getItem('lorena_session_id')) {
-            sessionStorage.setItem('lorena_session_id', 'session-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9));
+        if (!localStorage.getItem('lorena_session_id')) {
+            localStorage.setItem('lorena_session_id', 'session-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9));
         }
-        const SESSION_ID = sessionStorage.getItem('lorena_session_id');
+        const SESSION_ID = localStorage.getItem('lorena_session_id');
 
         let originalScrollY = 0;
 
