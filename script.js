@@ -299,9 +299,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (rawText) {
                     try {
                         const parsed = JSON.parse(rawText);
-                        botReply = (Array.isArray(parsed) ? (parsed[0].output || parsed[0].text) : (parsed.output || parsed.text)) || rawText;
+                        // Get initial content
+                        let content = (Array.isArray(parsed) ? (parsed[0].output || parsed[0].text) : (parsed.output || parsed.text)) || rawText;
+                        
+                        // Check if content is a stringified JSON (common in nested agent responses)
+                        if (typeof content === 'string' && content.trim().startsWith('{')) {
+                            try {
+                                const innerParsed = JSON.parse(content);
+                                botReply = innerParsed.output || innerParsed.text || content;
+                            } catch (e) {
+                                botReply = content;
+                            }
+                        } else {
+                            botReply = content;
+                        }
                     } catch (e) {
-                        // NDJSON or Plain Text
+                        // NDJSON or Plain Text fallback
                         const lines = rawText.split('\n').filter(l => l.trim() !== '');
                         let combined = '';
                         let isNdjson = false;
@@ -315,7 +328,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
 
-                // Generic trace stripping (like Nico Labs)
+                // Generic trace stripping
                 botReply = botReply.replace(/Calling\s+[\w-]+\s+with\s+input:\s*\{[^{}]*\}/g, '').trim();
                 addMessage(botReply, 'bot');
 
@@ -345,23 +358,33 @@ document.addEventListener('DOMContentLoaded', () => {
         function formatMessage(text) {
             if (!text) return '';
             
-            // Generic cleaning
-            let html = text.trim();
+            let content = text.trim();
             
-            // Bold
-            html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            // 1. Bold & Italic
+            content = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            content = content.replace(/\*(.*?)\*/g, '<em>$1</em>');
             
-            // Italic
-            html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+            // 2. Split into blocks by double newlines (paragraphs)
+            const blocks = content.split(/\n\n+/);
             
-            // Lists (simple)
-            html = html.replace(/^\s*-\s+(.*)$/gm, '<li>$1</li>');
-            html = html.replace(/(<li>.*<\/li>)/s, '<ul class="chat-list">$1</ul>');
+            const formattedBlocks = blocks.map(block => {
+                block = block.trim();
+                if (!block) return '';
+
+                // 3. Handle Lists (lines starting with - or *)
+                if (block.match(/^\s*[-*]\s+/m)) {
+                    const items = block.split(/\n/).map(line => {
+                        const match = line.match(/^\s*[-*]\s+(.*)$/);
+                        return match ? `<li>${match[1]}</li>` : line;
+                    }).join('');
+                    return `<ul class="chat-list">${items}</ul>`;
+                }
+                
+                // 4. Regular paragraph: replace single newlines with <br>
+                return `<p>${block.replace(/\n/g, '<br>')}</p>`;
+            });
             
-            // Line breaks
-            html = html.replace(/\n/g, '<br>');
-            
-            return html;
+            return formattedBlocks.join('');
         }
 
         function addTypingIndicator() {

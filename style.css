@@ -1,4 +1,4 @@
-﻿/* Reset and Base definitions not covered entirely by Tailwind */
+/* Reset and Base definitions not covered entirely by Tailwind */
 :root {
     --primary-color: #00bdd6;
     --primary-hover: #00a8c0;
@@ -630,6 +630,27 @@ header {
     border-bottom-left-radius: 4px;
     border: 1px solid #e2e8f0;
     color: #424242;
+}
+
+.message.bot p {
+    margin-bottom: 0.75rem;
+}
+
+.message.bot p:last-child {
+    margin-bottom: 0;
+}
+
+.message.bot .chat-list {
+    margin: 0.5rem 0 0.75rem 1.25rem;
+    list-style-type: disc;
+}
+
+.message.bot li {
+    margin-bottom: 0.25rem;
+}
+
+.message.bot li:last-child {
+    margin-bottom: 0;
 }
 
 .message.user {
