@@ -1047,21 +1047,23 @@ header {
     transform: scale(1.05);
 }
 
-.links-header h1 {
-    font-size: 1.75rem;
-    font-weight: 800;
+.links-description {
+    font-size: 1.1rem;
+    line-height: 1.6;
     color: #424242;
-    letter-spacing: 0.05em;
-    margin-bottom: 0.25rem;
+    max-width: 90%;
+    margin: 0 auto;
+    font-weight: 400;
 }
 
-.links-header p {
+.links-description .highlight {
     color: #00bdd6;
-    font-weight: 600;
-    font-size: 0.9rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
+    font-weight: 700;
+    display: block;
+    margin-top: 0.5rem;
+    font-size: 1.2rem;
 }
+
 
 .link-card {
     display: block;
