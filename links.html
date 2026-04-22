@@ -78,9 +78,14 @@
                     <span class="material-symbols-outlined">smart_toy</span>
                     <span class="font-bold">Loreley AI</span>
                 </div>
-                <button class="chat-close" id="chat-close">
-                    <span class="material-symbols-outlined">close</span>
-                </button>
+                <div class="chat-header-actions">
+                    <button class="chat-action-btn" id="chat-clear" title="Limpiar conversación">
+                        <span class="material-symbols-outlined">delete</span>
+                    </button>
+                    <button class="chat-close" id="chat-close">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
             </div>
             <div class="chat-messages" id="chat-messages">
                 <div class="message bot">
@@ -97,6 +102,27 @@
         <button class="chat-toggle" id="chat-toggle">
             <span class="material-symbols-outlined text-3xl">smart_toy</span>
         </button>
+    </div>
+
+    <!-- Notifications Overlay -->
+    <div class="form-notification-overlay" id="form-notification-overlay">
+        <div class="form-notification-card glass-panel-premium-compact">
+            <button id="notif-close-btn" class="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full bg-gray-100/50 text-gray-400 hover:text-[#00bdd6] transition-all duration-300">
+                <span class="material-symbols-outlined text-xl">close</span>
+            </button>
+            <div class="flex flex-col items-center text-center">
+                <div class="success-icon-container mb-3">
+                    <span class="material-symbols-outlined text-4xl text-[#4ade80] animate-check">check_circle</span>
+                </div>
+                <img src="Logo Lorena.png" alt="Lorena Lliviría" class="h-28 mb-3 drop-shadow-lg object-contain">
+                <h3 id="notif-title" class="text-lg font-black mb-1 text-professional-grey"></h3>
+                <p id="notif-subtitle" class="text-professional-grey/80 text-xs max-w-[240px] leading-relaxed"></p>
+                <div class="mt-4 flex gap-1 justify-center">
+                    <span class="h-1 w-4 bg-[#00bdd6] rounded-full"></span>
+                    <span class="h-1 w-8 bg-[#00bdd6]/30 rounded-full"></span>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="script.js"></script>

@@ -592,6 +592,32 @@ header {
     gap: 8px;
 }
 
+.chat-header-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.chat-action-btn {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    font-size: 1.1rem;
+}
+
+.chat-action-btn:hover {
+    color: #ff6b6b;
+    background: rgba(255, 107, 107, 0.15);
+    transform: scale(1.1);
+}
+
 .chat-close {
     background: none;
     border: none;
@@ -599,6 +625,9 @@ header {
     cursor: pointer;
     font-size: 1.2rem;
     opacity: 0.8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .chat-close:hover {

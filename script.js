@@ -174,7 +174,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!chatToggle || !chatWidget) return;
 
-
         // Intro animation for the toggle
         chatToggle.style.opacity = '0';
         chatToggle.style.transform = 'scale(0) rotate(-45deg)';
@@ -184,11 +183,58 @@ document.addEventListener('DOMContentLoaded', () => {
             chatToggle.style.transform = 'scale(1) rotate(0deg)';
         }, 1500);
 
-        // Generate or retrieve a unique session ID for this conversation
+        // Generate or retrieve a unique session ID (persistent across page visits)
         if (!localStorage.getItem('lorena_session_id')) {
             localStorage.setItem('lorena_session_id', 'session-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9));
         }
-        const SESSION_ID = localStorage.getItem('lorena_session_id');
+        let SESSION_ID = localStorage.getItem('lorena_session_id');
+        console.log('Chat Session ID:', SESSION_ID);
+
+        // ── Persistence: History Logic ──────────────────────────────────
+        function getHistory() {
+            return JSON.parse(localStorage.getItem('lorena_chat_history') || '[]');
+        }
+
+        function saveMessageToLocal(text, sender) {
+            const history = getHistory();
+            history.push({ text, sender, timestamp: Date.now() });
+            localStorage.setItem('lorena_chat_history', JSON.stringify(history));
+        }
+
+        function clearChatHistory() {
+            localStorage.removeItem('lorena_chat_history');
+            localStorage.removeItem('lorena_session_id');
+            // Regenerate session ID for a fresh conversation
+            localStorage.setItem('lorena_session_id', 'session-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9));
+            SESSION_ID = localStorage.getItem('lorena_session_id');
+
+            // Reset UI to welcome message
+            chatMessages.innerHTML = `
+                <div class="message bot">
+                    Hola, soy Loreley, tu asistente virtual. ¿En qué puedo ayudarte hoy sobre mis servicios de Pilates o Fisioterapia?
+                </div>
+            `;
+            showNotification('Conversación Reiniciada', 'Se ha generado una nueva sesión de chat.');
+        }
+
+        function loadChatHistory() {
+            const history = getHistory();
+            if (history.length > 0) {
+                chatMessages.innerHTML = '';
+                history.forEach(msg => {
+                    const div = document.createElement('div');
+                    div.classList.add('message', msg.sender);
+                    if (msg.sender === 'bot') {
+                        div.innerHTML = formatMessage(msg.text);
+                    } else {
+                        div.textContent = msg.text;
+                    }
+                    chatMessages.appendChild(div);
+                });
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+        }
+        // ── End Persistence ─────────────────────────────────────────────
 
         let originalScrollY = 0;
 
@@ -199,12 +245,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (chatWidget.classList.contains('active')) {
                 history.pushState({ chatOpen: true }, '');
                 if (window.innerWidth <= 768) {
-                    // Lock body to prevent scrolling when chat is fixed
                     originalScrollY = window.scrollY;
                     document.body.style.position = 'fixed';
                     document.body.style.top = `-${originalScrollY}px`;
                     document.body.style.width = '100%';
-                    // Sync height for mobile keyboard
                     setTimeout(adjustChatHeight, 50);
                 } else {
                     chatInput.focus();
@@ -248,14 +292,12 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active'));
         });
 
-        // Close active modal or chat on Escape key press
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 if (chatWidget.classList.contains('active')) {
                     closeChatUI();
                     if (history.state && history.state.chatOpen) history.back();
                 }
-
                 const activeModals = document.querySelectorAll('.modal-overlay.active');
                 if (activeModals.length > 0) {
                     activeModals.forEach(modal => modal.classList.remove('active'));
@@ -266,6 +308,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         chatToggle.addEventListener('click', toggleChat);
         chatClose.addEventListener('click', toggleChat);
+
+        // Wire up clear button
+        const chatClear = document.getElementById('chat-clear');
+        if (chatClear) chatClear.addEventListener('click', clearChatHistory);
+
+        // Load previous conversation history on init
+        loadChatHistory();
 
         async function sendMessage() {
             const text = chatInput.value.trim();
@@ -289,9 +338,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const rawText = await response.text();
                 removeMessage(typingId);
+                console.log('n8n raw response [status=' + response.status + ']:', rawText);
 
                 if (!response.ok) {
-                    addMessage('Lo siento, hubo un error de conexión.', 'bot');
+                    showNotification(
+                        'Error de Conexión',
+                        'No se pudo comunicar con el servidor (HTTP ' + response.status + '). Verificá que n8n esté activo.'
+                    );
                     return;
                 }
 
@@ -299,10 +352,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (rawText) {
                     try {
                         const parsed = JSON.parse(rawText);
-                        // Get initial content
                         let content = (Array.isArray(parsed) ? (parsed[0].output || parsed[0].text) : (parsed.output || parsed.text)) || rawText;
-                        
-                        // Check if content is a stringified JSON (common in nested agent responses)
                         if (typeof content === 'string' && content.trim().startsWith('{')) {
                             try {
                                 const innerParsed = JSON.parse(content);
@@ -326,15 +376,25 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                         botReply = (isNdjson && combined) ? combined : rawText;
                     }
+                } else {
+                    showNotification(
+                        'Sin Respuesta',
+                        'El agente no devolvió ninguna respuesta. Verificá que el flujo en n8n esté correctamente configurado.'
+                    );
+                    return;
                 }
 
-                // Generic trace stripping
+                // Strip tool traces from n8n agent
                 botReply = botReply.replace(/Calling\s+[\w-]+\s+with\s+input:\s*\{[^{}]*\}/g, '').trim();
                 addMessage(botReply, 'bot');
 
             } catch (error) {
                 removeMessage(typingId);
-                addMessage('Error al conectar con Loreley.', 'bot');
+                console.error('Chat fetch error:', error.name, error.message, error);
+                showNotification(
+                    'Error de Sistema',
+                    'Hubo un problema técnico al enviar el mensaje: ' + error.name + ' — ' + error.message
+                );
             }
         }
 
@@ -343,6 +403,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function addMessage(text, sender) {
             const div = document.createElement('div');
+            const id = 'msg-' + Date.now();
+            div.id = id;
             div.classList.add('message', sender);
             
             if (sender === 'bot') {
@@ -353,6 +415,11 @@ document.addEventListener('DOMContentLoaded', () => {
             
             chatMessages.appendChild(div);
             chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            // Save to localStorage for session persistence
+            saveMessageToLocal(text, sender);
+
+            return id;
         }
 
         function formatMessage(text) {
@@ -360,18 +427,18 @@ document.addEventListener('DOMContentLoaded', () => {
             
             let content = text.trim();
             
-            // 1. Bold & Italic
+            // Bold & Italic
             content = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
             content = content.replace(/\*(.*?)\*/g, '<em>$1</em>');
             
-            // 2. Split into blocks by double newlines (paragraphs)
+            // Split into blocks by double newlines (paragraphs)
             const blocks = content.split(/\n\n+/);
             
             const formattedBlocks = blocks.map(block => {
                 block = block.trim();
                 if (!block) return '';
 
-                // 3. Handle Lists (lines starting with - or *)
+                // Handle Lists (lines starting with - or *)
                 if (block.match(/^\s*[-*]\s+/m)) {
                     const items = block.split(/\n/).map(line => {
                         const match = line.match(/^\s*[-*]\s+(.*)$/);
@@ -380,7 +447,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     return `<ul class="chat-list">${items}</ul>`;
                 }
                 
-                // 4. Regular paragraph: replace single newlines with <br>
+                // Regular paragraph: replace single newlines with <br>
                 return `<p>${block.replace(/\n/g, '<br>')}</p>`;
             });
             
@@ -403,6 +470,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (el) el.remove();
         }
     }
+
 
     // --- Modals Logic ---
     function setupModal(triggerSelector, modalId) {
