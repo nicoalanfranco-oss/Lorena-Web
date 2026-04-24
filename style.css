@@ -611,9 +611,9 @@ header {
     position: absolute;
     bottom: 85px;
     right: 0;
-    width: 380px;
-    height: 60vh;
-    max-height: 700px;
+    width: 450px;
+    height: 75vh;
+    max-height: 850px;
     background: #ffffff;
     border-radius: 1rem;
     display: flex;

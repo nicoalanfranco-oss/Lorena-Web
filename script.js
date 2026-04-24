@@ -406,8 +406,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (cleaned.startsWith('"') && cleaned.endsWith('"')) {
                             cleaned = cleaned.substring(1, cleaned.length - 1).trim();
                         }
-                        return cleaned;
+                        result = cleaned;
                     }
+
+                    // Handle escaped newlines if they are literal \n strings
+                    result = result.replace(/\\n/g, '\n');
+
                     return result;
                 }
 
