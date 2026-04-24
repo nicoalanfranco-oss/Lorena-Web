@@ -397,7 +397,18 @@ document.addEventListener('DOMContentLoaded', () => {
                             break;
                         }
                     }
-                    return String(value);
+                    
+                    // Failsafe: If it still looks like it's wrapped in {} but failed parsing (malformed JSON)
+                    let result = String(value).trim();
+                    if (result.startsWith('{') && result.endsWith('}')) {
+                        let cleaned = result.substring(1, result.length - 1).trim();
+                        // If it's also wrapped in quotes, strip them
+                        if (cleaned.startsWith('"') && cleaned.endsWith('"')) {
+                            cleaned = cleaned.substring(1, cleaned.length - 1).trim();
+                        }
+                        return cleaned;
+                    }
+                    return result;
                 }
 
                 let botReply = extractBotText(textToProcess);
