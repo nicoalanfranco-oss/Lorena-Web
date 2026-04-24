@@ -352,17 +352,29 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (rawText) {
                     try {
                         const parsed = JSON.parse(rawText);
-                        let content = (Array.isArray(parsed) ? (parsed[0].output || parsed[0].text) : (parsed.output || parsed.text)) || rawText;
-                        if (typeof content === 'string' && content.trim().startsWith('{')) {
-                            try {
-                                const innerParsed = JSON.parse(content);
-                                botReply = innerParsed.output || innerParsed.text || content;
-                            } catch (e) {
-                                botReply = content;
+                        // Standard n8n response is an array or object with 'output' or 'text'
+                        let content = (Array.isArray(parsed) ? (parsed[0]?.output || parsed[0]?.text) : (parsed.output || parsed.text)) || rawText;
+                        
+                        // Handle potential double-encoding or weird wrapping
+                        if (typeof content === 'string') {
+                            content = content.trim();
+                            
+                            // If it's a JSON string inside the content or just wrapped in braces
+                            if (content.startsWith('{')) {
+                                try {
+                                    const innerParsed = JSON.parse(content);
+                                    content = innerParsed.output || innerParsed.text || innerParsed.message || content;
+                                } catch (e) {
+                                    // If it's not valid JSON but wrapped in {}, strip the braces and quotes
+                                    // This happens when the agent returns a raw string inside braces
+                                    let cleaned = content.replace(/^\{|\}$/g, '').trim();
+                                    // Remove leading/trailing quotes if they wrap the entire remaining content
+                                    cleaned = cleaned.replace(/^"|"$/g, '').trim();
+                                    content = cleaned;
+                                }
                             }
-                        } else {
-                            botReply = content;
                         }
+                        botReply = content;
                     } catch (e) {
                         // NDJSON or Plain Text fallback
                         const lines = rawText.split('\n').filter(l => l.trim() !== '');
