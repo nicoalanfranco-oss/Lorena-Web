@@ -352,41 +352,83 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (rawText) {
                     try {
                         const parsed = JSON.parse(rawText);
-                        // Standard n8n response is an array or object with 'output' or 'text'
-                        let content = (Array.isArray(parsed) ? (parsed[0]?.output || parsed[0]?.text) : (parsed.output || parsed.text)) || rawText;
                         
-                        // Handle potential double-encoding or weird wrapping
+                        // 1. Try to find content in standard fields
+                        let content = (Array.isArray(parsed) 
+                            ? (parsed[0]?.output || parsed[0]?.text || parsed[0]?.message || parsed[0]?.response) 
+                            : (parsed.output || parsed.text || parsed.message || parsed.response)) || null;
+
+                        // 2. If no standard field, but it's an object, find the longest string (best effort)
+                        if (content === null && typeof parsed === 'object' && !Array.isArray(parsed)) {
+                            let longestString = '';
+                            for (let key in parsed) {
+                                if (typeof parsed[key] === 'string' && parsed[key].length > longestString.length) {
+                                    longestString = parsed[key];
+                                }
+                            }
+                            content = longestString || JSON.stringify(parsed);
+                        } else if (content === null) {
+                            content = rawText;
+                        }
+
+                        // 3. Handle potential double-encoding or weird wrapping in the extracted content
                         if (typeof content === 'string') {
                             content = content.trim();
                             
-                            // If it's a JSON string inside the content or just wrapped in braces
-                            if (content.startsWith('{')) {
+                            if (content.startsWith('{') || content.startsWith('[')) {
                                 try {
                                     const innerParsed = JSON.parse(content);
-                                    content = innerParsed.output || innerParsed.text || innerParsed.message || content;
+                                    let innerContent = (Array.isArray(innerParsed) 
+                                        ? (innerParsed[0]?.output || innerParsed[0]?.text || innerParsed[0]?.message) 
+                                        : (innerParsed.output || innerParsed.text || innerParsed.message)) || null;
+                                    
+                                    if (innerContent) {
+                                        content = innerContent;
+                                    } else if (typeof innerParsed === 'object') {
+                                        // Best effort for inner object
+                                        let innerLongest = '';
+                                        for (let k in innerParsed) {
+                                            if (typeof innerParsed[k] === 'string' && innerParsed[k].length > innerLongest.length) {
+                                                innerLongest = innerParsed[k];
+                                            }
+                                        }
+                                        if (innerLongest) content = innerLongest;
+                                    }
                                 } catch (e) {
-                                    // If it's not valid JSON but wrapped in {}, strip the braces and quotes
-                                    // This happens when the agent returns a raw string inside braces
-                                    let cleaned = content.replace(/^\{|\}$/g, '').trim();
-                                    // Remove leading/trailing quotes if they wrap the entire remaining content
-                                    cleaned = cleaned.replace(/^"|"$/g, '').trim();
-                                    content = cleaned;
+                                    // Not valid JSON but wrapped in {} or [], strip them
+                                    let cleaned = content;
+                                    if ((cleaned.startsWith('{') && cleaned.endsWith('}')) || 
+                                        (cleaned.startsWith('[') && cleaned.endsWith(']'))) {
+                                        cleaned = cleaned.substring(1, cleaned.length - 1).trim();
+                                        cleaned = cleaned.replace(/^"|"$/g, '').trim();
+                                        content = cleaned;
+                                    }
                                 }
                             }
                         }
                         botReply = content;
+
                     } catch (e) {
-                        // NDJSON or Plain Text fallback
-                        const lines = rawText.split('\n').filter(l => l.trim() !== '');
-                        let combined = '';
-                        let isNdjson = false;
-                        for (const l of lines) {
-                            try {
-                                const p = JSON.parse(l);
-                                if (p.type === 'item' && p.content) { combined += p.content; isNdjson = true; }
-                            } catch (err) {}
+                        // If initial parse fails, try to see if it's just wrapped in {} or []
+                        let cleaned = rawText.trim();
+                        if ((cleaned.startsWith('{') && cleaned.endsWith('}')) || 
+                            (cleaned.startsWith('[') && cleaned.endsWith(']'))) {
+                            cleaned = cleaned.substring(1, cleaned.length - 1).trim();
+                            cleaned = cleaned.replace(/^"|"$/g, '').trim();
+                            botReply = cleaned || rawText;
+                        } else {
+                            // NDJSON fallback
+                            const lines = rawText.split('\n').filter(l => l.trim() !== '');
+                            let combined = '';
+                            let isNdjson = false;
+                            for (const l of lines) {
+                                try {
+                                    const p = JSON.parse(l);
+                                    if (p.type === 'item' && p.content) { combined += p.content; isNdjson = true; }
+                                } catch (err) {}
+                            }
+                            botReply = (isNdjson && combined) ? combined : rawText;
                         }
-                        botReply = (isNdjson && combined) ? combined : rawText;
                     }
                 } else {
                     showNotification(
