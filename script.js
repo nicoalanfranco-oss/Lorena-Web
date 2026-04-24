@@ -336,6 +336,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     })
                 });
 
+                // Always read as text first
                 const rawText = await response.text();
                 removeMessage(typingId);
                 console.log('n8n raw response [status=' + response.status + ']:', rawText);
@@ -348,89 +349,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     return;
                 }
 
-                let botReply = '';
-                if (rawText) {
-                    try {
-                        const parsed = JSON.parse(rawText);
-                        
-                        // 1. Try to find content in standard fields
-                        let content = (Array.isArray(parsed) 
-                            ? (parsed[0]?.output || parsed[0]?.text || parsed[0]?.message || parsed[0]?.response) 
-                            : (parsed.output || parsed.text || parsed.message || parsed.response)) || null;
-
-                        // 2. If no standard field, but it's an object, find the longest string (best effort)
-                        if (content === null && typeof parsed === 'object' && !Array.isArray(parsed)) {
-                            let longestString = '';
-                            for (let key in parsed) {
-                                if (typeof parsed[key] === 'string' && parsed[key].length > longestString.length) {
-                                    longestString = parsed[key];
-                                }
-                            }
-                            content = longestString || JSON.stringify(parsed);
-                        } else if (content === null) {
-                            content = rawText;
-                        }
-
-                        // 3. Handle potential double-encoding or weird wrapping in the extracted content
-                        if (typeof content === 'string') {
-                            content = content.trim();
-                            
-                            if (content.startsWith('{') || content.startsWith('[')) {
-                                try {
-                                    const innerParsed = JSON.parse(content);
-                                    let innerContent = (Array.isArray(innerParsed) 
-                                        ? (innerParsed[0]?.output || innerParsed[0]?.text || innerParsed[0]?.message) 
-                                        : (innerParsed.output || innerParsed.text || innerParsed.message)) || null;
-                                    
-                                    if (innerContent) {
-                                        content = innerContent;
-                                    } else if (typeof innerParsed === 'object') {
-                                        // Best effort for inner object
-                                        let innerLongest = '';
-                                        for (let k in innerParsed) {
-                                            if (typeof innerParsed[k] === 'string' && innerParsed[k].length > innerLongest.length) {
-                                                innerLongest = innerParsed[k];
-                                            }
-                                        }
-                                        if (innerLongest) content = innerLongest;
-                                    }
-                                } catch (e) {
-                                    // Not valid JSON but wrapped in {} or [], strip them
-                                    let cleaned = content;
-                                    if ((cleaned.startsWith('{') && cleaned.endsWith('}')) || 
-                                        (cleaned.startsWith('[') && cleaned.endsWith(']'))) {
-                                        cleaned = cleaned.substring(1, cleaned.length - 1).trim();
-                                        cleaned = cleaned.replace(/^"|"$/g, '').trim();
-                                        content = cleaned;
-                                    }
-                                }
-                            }
-                        }
-                        botReply = content;
-
-                    } catch (e) {
-                        // If initial parse fails, try to see if it's just wrapped in {} or []
-                        let cleaned = rawText.trim();
-                        if ((cleaned.startsWith('{') && cleaned.endsWith('}')) || 
-                            (cleaned.startsWith('[') && cleaned.endsWith(']'))) {
-                            cleaned = cleaned.substring(1, cleaned.length - 1).trim();
-                            cleaned = cleaned.replace(/^"|"$/g, '').trim();
-                            botReply = cleaned || rawText;
-                        } else {
-                            // NDJSON fallback
-                            const lines = rawText.split('\n').filter(l => l.trim() !== '');
-                            let combined = '';
-                            let isNdjson = false;
-                            for (const l of lines) {
-                                try {
-                                    const p = JSON.parse(l);
-                                    if (p.type === 'item' && p.content) { combined += p.content; isNdjson = true; }
-                                } catch (err) {}
-                            }
-                            botReply = (isNdjson && combined) ? combined : rawText;
-                        }
-                    }
-                } else {
+                if (!rawText) {
                     showNotification(
                         'Sin Respuesta',
                         'El agente no devolvió ninguna respuesta. Verificá que el flujo en n8n esté correctamente configurado.'
@@ -438,9 +357,57 @@ document.addEventListener('DOMContentLoaded', () => {
                     return;
                 }
 
-                // Strip tool traces from n8n agent
-                botReply = botReply.replace(/Calling\s+[\w-]+\s+with\s+input:\s*\{[^{}]*\}/g, '').trim();
-                addMessage(botReply, 'bot');
+                // 1. Check if it is NDJSON (streaming format from n8n)
+                let combinedText = '';
+                let isNdjson = false;
+                const lines = rawText.split('\n').filter(line => line.trim() !== '');
+                
+                for (const line of lines) {
+                    try {
+                        const parsedLine = JSON.parse(line);
+                        if (parsedLine && parsedLine.type === 'item' && parsedLine.content !== undefined) {
+                            combinedText += parsedLine.content;
+                            isNdjson = true;
+                        }
+                    } catch (e) {
+                        // Ignore lines that are not valid JSON
+                    }
+                }
+
+                // The text we will try to unwrap
+                let textToProcess = (isNdjson && combinedText) ? combinedText : rawText;
+
+                // 2. Helper: deeply extract the text content from potentially nested JSON responses.
+                function extractBotText(raw) {
+                    let value = raw;
+                    // Keep unwrapping as long as it looks like a JSON string
+                    for (let i = 0; i < 3; i++) {
+                        if (typeof value !== 'string') break;
+                        const trimmed = value.trim();
+                        if (!trimmed.startsWith('{') && !trimmed.startsWith('[')) break;
+                        try {
+                            const parsed = JSON.parse(trimmed);
+                            const candidate = Array.isArray(parsed)
+                                ? (parsed[0]?.output ?? parsed[0]?.text ?? parsed[0]?.message)
+                                : (parsed.output ?? parsed.text ?? parsed.message);
+                            
+                            if (candidate === undefined || candidate === null) break;
+                            value = candidate;
+                        } catch (e) {
+                            break;
+                        }
+                    }
+                    return String(value);
+                }
+
+                let botReply = extractBotText(textToProcess);
+
+                // Helper: strip all "Calling <tool> with input: {...}" traces from n8n
+                function stripToolTraces(text) {
+                    return text.replace(/Calling\s+[\w-]+\s+with\s+input:\s*\{[^{}]*\}/g, '').trim();
+                }
+
+                addMessage(stripToolTraces(botReply), 'bot');
 
             } catch (error) {
                 removeMessage(typingId);
