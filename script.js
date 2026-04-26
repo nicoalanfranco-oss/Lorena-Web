@@ -1,33 +1,36 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    // --- Firebase & Sync Logic ---
-    const firebaseConfig = {
-        projectId: "studio-4748759464-52942",
-        appId: "1:713780303554:web:56ea6589fa0c00217b4d5b",
-        storageBucket: "studio-4748759464-52942.firebasestorage.app",
-        apiKey: "AIzaSyAgB9JBpuNWvEVU5uR5k41IVKKFhVlpo-w",
-        authDomain: "studio-4748759464-52942.firebaseapp.com",
-        messagingSenderId: "713780303554"
-    };
+    // --- API Data Load (direct from PostgreSQL via studio-main) ---
+    const API_BASE = 'https://studio-main-1--studio-4748759464-52942.us-east4.hosted.app';
 
-    // Inicializar Firebase si los scripts están cargados
-    if (typeof firebase !== 'undefined') {
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
+    async function loadWebData() {
+        try {
+            const [horariosRes, preciosRes] = await Promise.all([
+                fetch(`${API_BASE}/api/web/horarios`),
+                fetch(`${API_BASE}/api/web/precios`)
+            ]);
 
-        // Escuchar cambios en tiempo real en Firestore
-        // El documento 'public_data' será actualizado por n8n basado en studio-main
-        db.collection('web_config').doc('public_data').onSnapshot((doc) => {
-            if (doc.exists) {
-                const data = doc.data();
-                renderDynamicSchedules(data.horarios || []);
-                renderDynamicPrices(data.precios || []);
+            if (horariosRes.ok) {
+                const horarios = await horariosRes.json();
+                renderDynamicSchedules(horarios || []);
+            } else {
+                console.error('Error cargando horarios:', horariosRes.status);
             }
-        }, (error) => {
-            console.error("Error escuchando Firestore:", error);
+
+            if (preciosRes.ok) {
+                const precios = await preciosRes.json();
+                renderDynamicPrices(precios || []);
+            } else {
+                console.error('Error cargando precios:', preciosRes.status);
+            }
+
+        } catch (error) {
+            console.error('Error cargando datos de la web:', error);
             renderFallbacks();
-        });
+        }
     }
+
+    loadWebData();
 
     function renderDynamicSchedules(horarios) {
         const container = document.getElementById('horarios-dynamic-container');
