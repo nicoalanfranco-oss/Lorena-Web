@@ -49,15 +49,17 @@ document.addEventListener('DOMContentLoaded', () => {
             const horariosDia = horarios.filter(h => h.nombre_dia === dia);
             if (horariosDia.length === 0 && index > 3) return; // Omitir viernes/fin de semana si no hay nada
 
-            const am = horariosDia.find(h => parseInt(h.hora.split(':')[0]) < 12);
+            const am = horariosDia.filter(h => parseInt(h.hora.split(':')[0]) < 12);
             const pm = horariosDia.filter(h => parseInt(h.hora.split(':')[0]) >= 12);
 
             html += `<tr class="border-b ${index % 2 !== 0 ? 'bg-gray-50/50' : ''}">
                 <td class="p-4 font-semibold">${dia}</td>
-                <td class="p-4">${am ? `
-                    <div class="text-[#00bdd6] font-bold">${am.hora.substring(0, 5)} a ${calcularFin(am.hora, am.duracion_min)}</div>
-                    <div class="text-[10px] sm:text-xs text-professional-grey/60 mt-1 leading-tight">*Horario de inicio.</div>
-                ` : '--'}</td>
+                <td class="p-4">${am.length > 0 ? am.map(p => `
+                    <div class="mb-2 last:mb-0">
+                        <div class="text-[#00bdd6] font-bold">${p.hora.substring(0, 5)} hs</div>
+                        <div class="text-[10px] sm:text-xs text-professional-grey/60 leading-tight">*Inicio. Duración ${p.duracion_min}m</div>
+                    </div>
+                `).join('') : '--'}</td>
                 <td class="p-4">${pm.length > 0 ? pm.map(p => `
                     <div class="mb-2 last:mb-0">
                         <div class="text-[#00bdd6] font-bold">${p.hora.substring(0, 5)} hs</div>
