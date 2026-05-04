@@ -341,6 +341,7 @@ header {
     transition: opacity 2s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+.hero-brand-subtitle,
 .hero-title,
 .hero-subtitle,
 .hero-cta {
@@ -353,10 +354,16 @@ header {
     opacity: 1;
 }
 
+.hero-section.hero-active .hero-brand-subtitle {
+    opacity: 1;
+    transform: translateY(0);
+    transition-delay: 0.2s;
+}
+
 .hero-section.hero-active .hero-title {
     opacity: 1;
     transform: translateY(0);
-    transition-delay: 0.3s;
+    transition-delay: 0.4s;
 }
 
 .hero-section.hero-active .hero-subtitle {
@@ -368,7 +375,17 @@ header {
 .hero-section.hero-active .hero-cta {
     opacity: 1;
     transform: translateY(0);
-    transition-delay: 0.9s;
+    transition-delay: 1s;
+}
+
+.hero-brand-subtitle {
+    font-family: var(--font-main);
+    font-weight: 700;
+    font-size: 0.9rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--primary-color);
+    margin-bottom: 12px;
 }
 
 .hero-content {
