@@ -379,28 +379,40 @@ header {
 }
 
 .hero-brand-subtitle {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    text-align: center;
     font-family: var(--font-main);
-    font-weight: 700;
-    font-size: 0.9rem;
-    letter-spacing: 0.2em;
+    font-weight: 800;
+    font-size: 1.3rem;
+    letter-spacing: 0.15em;
     text-transform: uppercase;
-    color: var(--primary-color);
-    margin-bottom: 12px;
+    color: #111111;
+    background: rgba(255, 255, 255, 0.65);
+    border: 1.5px solid rgba(0, 189, 214, 0.5);
+    padding: 10px 12px;
+    border-radius: 100px;
+    backdrop-filter: blur(14px);
+    margin-bottom: 85px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+    transition: all 0.4s ease;
 }
 
 .hero-content {
+    width: fit-content;
     max-width: 600px;
     z-index: 2;
     position: relative;
 }
 
 .hero-title {
-    font-size: 4rem;
+    font-size: 5rem;
     line-height: 1.05;
     margin-bottom: 24px;
     font-weight: 800;
     letter-spacing: -0.02em;
-    color: #424242;
+    color: #111111;
 }
 
 .hero-subtitle {
@@ -922,6 +934,13 @@ header {
 
     .hero-title {
         font-size: 2.8rem;
+    }
+
+    .hero-brand-subtitle {
+        font-size: 1.0rem;
+        padding: 8px 10px;
+        letter-spacing: 0.12em;
+        margin-bottom: 65px;
     }
 
     .hero-section {
