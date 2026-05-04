@@ -1,33 +1,31 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    // --- Firebase Initialization ---
-    const firebaseConfig = {
-      projectId: "studio-4748759464-52942",
-      appId: "1:713780303554:web:30618d9e613b23a17b4d5b",
-      storageBucket: "studio-4748759464-52942.firebasestorage.app",
-      apiKey: "AIzaSyD1tppmgsIBMJauBmmY6ZaLPL3iDLBJO_4",
-      authDomain: "studio-4748759464-52942.firebaseapp.com",
-      messagingSenderId: "713780303554"
-    };
+    // --- API Data Load (direct from PostgreSQL via studio-main) ---
+    const API_BASE = 'https://studio-main-1--studio-4748759464-52942.us-east4.hosted.app';
 
-    if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-    }
-    const db = firebase.firestore();
-
-    // --- Firebase Data Load ---
     async function loadWebData() {
         try {
-            const horariosSnapshot = await db.collection('horarios').get();
-            const horarios = horariosSnapshot.docs.map(doc => doc.data());
-            renderDynamicSchedules(horarios);
+            const [horariosRes, preciosRes] = await Promise.all([
+                fetch(`${API_BASE}/api/web/horarios`),
+                fetch(`${API_BASE}/api/web/precios`)
+            ]);
 
-            const preciosSnapshot = await db.collection('precios').get();
-            const precios = preciosSnapshot.docs.map(doc => doc.data());
-            renderDynamicPrices(precios);
+            if (horariosRes.ok) {
+                const horarios = await horariosRes.json();
+                renderDynamicSchedules(horarios || []);
+            } else {
+                console.error('Error cargando horarios:', horariosRes.status);
+            }
+
+            if (preciosRes.ok) {
+                const precios = await preciosRes.json();
+                renderDynamicPrices(precios || []);
+            } else {
+                console.error('Error cargando precios:', preciosRes.status);
+            }
 
         } catch (error) {
-            console.error('Error cargando datos de Firebase:', error);
+            console.error('Error cargando datos de la web:', error);
             renderFallbacks();
         }
     }
