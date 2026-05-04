@@ -315,8 +315,8 @@ d rgba(0, 189, 214, 0.4);
     height: 100vh;
     display: flex;
     align-items: center;
-    justify-content: flex-end; /* Movido al extremo derecho */
-    padding: 100px 5% 0 5%;
+    justify-content: flex-start; /* Regresado al extremo izquierdo */
+    padding: 100px 5% 0 5%; /* Mantiene un margen del 5% */
     position: relative;
     overflow: hidden;
     background-attachment: scroll;
@@ -335,7 +335,7 @@ header {
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(to left, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.5) 60%, transparent 100%);
+    background: linear-gradient(to right, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.5) 60%, transparent 100%);
     z-index: 1;
     opacity: 0;
     transition: opacity 2s cubic-bezier(0.22, 1, 0.36, 1);
