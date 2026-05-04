@@ -315,8 +315,8 @@ d rgba(0, 189, 214, 0.4);
     height: 100vh;
     display: flex;
     align-items: center;
-    justify-content: flex-start;
-    padding: 100px 5% 0 5%; /* Movido mÃ¡s a la izquierda */
+    justify-content: flex-end; /* Movido al extremo derecho */
+    padding: 100px 5% 0 5%;
     position: relative;
     overflow: hidden;
     background-attachment: scroll;
@@ -335,7 +335,7 @@ header {
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(to right, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.5) 60%, transparent 100%);
+    background: linear-gradient(to left, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.5) 60%, transparent 100%);
     z-index: 1;
     opacity: 0;
     transition: opacity 2s cubic-bezier(0.22, 1, 0.36, 1);
@@ -400,7 +400,7 @@ header {
 }
 
 .brand-name {
-    font-size: 2.5rem;
+    font-size: 2rem; /* Reducido moderadamente */
     font-weight: 900;
     letter-spacing: 0.15em;
     line-height: 1.1;
@@ -408,7 +408,7 @@ header {
 }
 
 .brand-tagline {
-    font-size: 1.4rem;
+    font-size: 1.1rem; /* Reducido moderadamente */
     font-weight: 700;
     letter-spacing: 0.2em;
     color: #222222;
@@ -434,7 +434,7 @@ header {
 }
 
 .hero-title {
-    font-size: 2.8rem;
+    font-size: 2.4rem; /* Reducido ligeramente */
     line-height: 1.2;
     margin-bottom: 28px;
     font-weight: 800;
@@ -1001,6 +1001,11 @@ header {
 
     .hero-section {
         padding-left: 5%;
+        justify-content: center;
+    }
+
+    .hero-overlay {
+        background: linear-gradient(to bottom, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.7) 50%, rgba(255, 255, 255, 0.4) 100%);
     }
 
     .chat-widget {
