@@ -316,7 +316,7 @@ d rgba(0, 189, 214, 0.4);
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    padding: 100px 5% 0 8%; /* Espacio para que el texto no choque con el menÃº */
+    padding: 100px 5% 0 5%; /* Movido mÃ¡s a la izquierda */
     position: relative;
     overflow: hidden;
     background-attachment: scroll;
@@ -381,11 +381,11 @@ header {
 .hero-brand-subtitle {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start; /* Alineado a la izquierda */
     gap: 8px;
-    width: 100%;
+    width: fit-content;
     box-sizing: border-box;
-    text-align: center;
+    text-align: left; /* Alineado a la izquierda */
     font-family: var(--font-main);
     text-transform: uppercase;
     color: #000000;
@@ -422,7 +422,7 @@ header {
     position: relative;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start; /* Alineado a la izquierda */
 }
 
 .hero-header-container {
@@ -430,7 +430,7 @@ header {
     max-width: 100%;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start; /* Alineado a la izquierda */
 }
 
 .hero-title {
@@ -448,6 +448,8 @@ header {
     color: #64748b;
     margin-bottom: 30px;
     line-height: 1.6;
+    text-align: left;
+    max-width: 100%;
 }
 
 .hero-cta {
