@@ -195,6 +195,24 @@ document.addEventListener('DOMContentLoaded', () => {
         let SESSION_ID = localStorage.getItem('lorena_session_id');
         console.log('Chat Session ID:', SESSION_ID);
 
+        async function sendToChatwoot(content, messageType) {
+            try {
+                await fetch('https://n8n.nico-family.com/webhook/Chatwoot_Lorena', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        identifier: SESSION_ID,
+                        name: 'Lorena Lliviría (Web)',
+                        content: content,
+                        message_type: messageType,
+                        private: false
+                    })
+                });
+            } catch (error) {
+                console.error('Error sending to Chatwoot:', error);
+            }
+        }
+
         // ── Persistence: History Logic ──────────────────────────────────
         function getHistory() {
             return JSON.parse(localStorage.getItem('lorena_chat_history') || '[]');
@@ -326,6 +344,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!text) return;
 
             addMessage(text, 'user');
+            sendToChatwoot(text, 'incoming');
             chatInput.value = '';
             const typingId = addTypingIndicator();
 
@@ -427,7 +446,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     return text.replace(/Calling\s+[\w-]+\s+with\s+input:\s*\{[^{}]*\}/g, '').trim();
                 }
 
-                addMessage(stripToolTraces(botReply), 'bot');
+                const cleanedReply = stripToolTraces(botReply);
+                addMessage(cleanedReply, 'bot');
+                sendToChatwoot(cleanedReply, 'outgoing');
 
             } catch (error) {
                 removeMessage(typingId);
