@@ -196,7 +196,7 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('Chat Session ID:', SESSION_ID);
 
         async function sendToChatwoot(content, messageType) {
-            const INBOX_IDENTIFIER = 't3zsNXrstAwfs4at11A1ENaz';
+            const INBOX_IDENTIFIER = 'yQrjvkNiNLdfU7PqG4MhaLVq';
             const BASE_URL = 'https://chatwoot.nico-family.com/public/api/v1/inboxes/' + INBOX_IDENTIFIER;
             
             try {
