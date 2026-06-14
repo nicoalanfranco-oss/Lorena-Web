@@ -196,65 +196,103 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('Chat Session ID:', SESSION_ID);
 
         async function sendToChatwoot(content, messageType) {
-            const INBOX_IDENTIFIER = 'yQrjvkNiNLdfU7PqG4MhaLVq';
-            const BASE_URL = 'https://chatwoot.nico-family.com/public/api/v1/inboxes/' + INBOX_IDENTIFIER;
-            
-            try {
-                // 1. Get or Create Contact in Chatwoot
-                let sourceId = sessionStorage.getItem('lorena_chatwoot_source_id');
-                if (!sourceId) {
-                    const contactRes = await fetch(BASE_URL + '/contacts', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            identifier: SESSION_ID,
-                            name: 'Lorena Lliviría (Web)'
-                        })
-                    });
-                    if (!contactRes.ok) throw new Error('Failed to create/get Chatwoot contact: ' + contactRes.status);
-                    const contactData = await contactRes.json();
-                    sourceId = contactData.source_id;
-                    sessionStorage.setItem('lorena_chatwoot_source_id', sourceId);
-                }
+            const CHATWOOT_BASE = 'https://chatwoot.nico-family.com/api/v1/accounts/3';
+            const CHATWOOT_TOKEN = 'tR63WP3g1B65ciHLnuV79r5u';
+            const INBOX_ID = 14;
 
-                // 2. Get or Create Conversation
-                let conversationId = sessionStorage.getItem('lorena_chatwoot_conversation_id');
-                if (!conversationId) {
-                    // Check if there is an existing conversation
-                    const convListRes = await fetch(BASE_URL + '/contacts/' + sourceId + '/conversations');
-                    if (convListRes.ok) {
-                        const convList = await convListRes.json();
-                        if (convList && convList.length > 0) {
-                            conversationId = convList[0].id;
+            try {
+                // ── PASO 1: Obtener o crear contacto ─────────────────────────────
+                let contactId = sessionStorage.getItem('lorena_chatwoot_contact_id');
+
+                if (!contactId) {
+                    // Buscar contacto existente por identifier (SESSION_ID)
+                    const searchRes = await fetch(
+                        `${CHATWOOT_BASE}/contacts/search?q=${encodeURIComponent(SESSION_ID)}&page=1&include_contacts=true`,
+                        { headers: { 'api_access_token': CHATWOOT_TOKEN } }
+                    );
+                    if (searchRes.ok) {
+                        const searchData = await searchRes.json();
+                        // payload may be an array (some versions) or object with .contacts
+                        const contacts = Array.isArray(searchData.payload)
+                            ? searchData.payload
+                            : (searchData.payload && Array.isArray(searchData.payload.contacts))
+                                ? searchData.payload.contacts
+                                : [];
+                        const existing = contacts.find(c => c.identifier === SESSION_ID);
+                        if (existing) contactId = existing.id;
+                    }
+
+                    // Si no existe, crear contacto nuevo
+                    if (!contactId) {
+                        const createRes = await fetch(`${CHATWOOT_BASE}/contacts`, {
+                            method: 'POST',
+                            headers: { 'api_access_token': CHATWOOT_TOKEN, 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                name: 'Visitante Web',
+                                identifier: SESSION_ID
+                            })
+                        });
+                        if (createRes.ok) {
+                            const createData = await createRes.json();
+                            // Chatwoot wraps the contact in payload.contact
+                            contactId = (createData.payload && createData.payload.contact)
+                                ? createData.payload.contact.id
+                                : createData.id;
                         }
                     }
-                    
-                    // If no conversation found, create one
-                    if (!conversationId) {
-                        const convCreateRes = await fetch(BASE_URL + '/contacts/' + sourceId + '/conversations', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({})
-                        });
-                        if (!convCreateRes.ok) throw new Error('Failed to create Chatwoot conversation: ' + convCreateRes.status);
-                        const convData = await convCreateRes.json();
-                        conversationId = convData.id;
-                    }
-                    
-                    sessionStorage.setItem('lorena_chatwoot_conversation_id', conversationId);
+
+                    if (contactId) sessionStorage.setItem('lorena_chatwoot_contact_id', contactId);
                 }
 
-                // 3. Send the message
-                const msgRes = await fetch(BASE_URL + '/contacts/' + sourceId + '/conversations/' + conversationId + '/messages', {
+                if (!contactId) throw new Error('[Chatwoot] No se pudo obtener/crear contacto');
+
+                // ── PASO 2: Obtener o crear conversación en inbox 14 ─────────────
+                let conversationId = sessionStorage.getItem('lorena_chatwoot_conversation_id');
+
+                if (!conversationId) {
+                    // Buscar conversación existente en inbox 14 (no resuelta)
+                    const convsRes = await fetch(`${CHATWOOT_BASE}/contacts/${contactId}/conversations`, {
+                        headers: { 'api_access_token': CHATWOOT_TOKEN }
+                    });
+                    if (convsRes.ok) {
+                        const convsData = await convsRes.json();
+                        const convs = convsData.payload;
+                        if (Array.isArray(convs)) {
+                            const webConv = convs.find(c => c.inbox_id === INBOX_ID && c.status !== 'resolved');
+                            if (webConv) conversationId = webConv.id;
+                        }
+                    }
+
+                    // Si no existe, crear conversación nueva
+                    if (!conversationId) {
+                        const newConvRes = await fetch(`${CHATWOOT_BASE}/conversations`, {
+                            method: 'POST',
+                            headers: { 'api_access_token': CHATWOOT_TOKEN, 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ inbox_id: INBOX_ID, contact_id: contactId })
+                        });
+                        if (newConvRes.ok) {
+                            const newConvData = await newConvRes.json();
+                            conversationId = newConvData.id;
+                        }
+                    }
+
+                    if (conversationId) sessionStorage.setItem('lorena_chatwoot_conversation_id', conversationId);
+                }
+
+                if (!conversationId) throw new Error('[Chatwoot] No se pudo obtener/crear conversación');
+
+                // ── PASO 3: Enviar mensaje ────────────────────────────────────────
+                const msgRes = await fetch(`${CHATWOOT_BASE}/conversations/${conversationId}/messages`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'api_access_token': CHATWOOT_TOKEN, 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         content: content,
-                        message_type: messageType
+                        message_type: messageType === 'incoming' ? 0 : 1,
+                        private: false
                     })
                 });
-                if (!msgRes.ok) throw new Error('Failed to send message to Chatwoot: ' + msgRes.status);
-                
+                if (!msgRes.ok) throw new Error('[Chatwoot] Error enviando mensaje: ' + msgRes.status);
+
             } catch (error) {
                 console.error('Error in sendToChatwoot:', error);
             }
@@ -274,7 +312,7 @@ document.addEventListener('DOMContentLoaded', () => {
         function clearChatHistory() {
             localStorage.removeItem('lorena_chat_history');
             localStorage.removeItem('lorena_session_id');
-            sessionStorage.removeItem('lorena_chatwoot_source_id');
+            sessionStorage.removeItem('lorena_chatwoot_contact_id');
             sessionStorage.removeItem('lorena_chatwoot_conversation_id');
             // Regenerate session ID for a fresh conversation
             localStorage.setItem('lorena_session_id', 'session-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9));
