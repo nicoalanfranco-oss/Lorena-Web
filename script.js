@@ -196,20 +196,67 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('Chat Session ID:', SESSION_ID);
 
         async function sendToChatwoot(content, messageType) {
+            const INBOX_IDENTIFIER = 't3zsNXrstAwfs4at11A1ENaz';
+            const BASE_URL = 'https://chatwoot.nico-family.com/public/api/v1/inboxes/' + INBOX_IDENTIFIER;
+            
             try {
-                await fetch('https://n8n.nico-family.com/webhook/Chatwoot_Lorena', {
+                // 1. Get or Create Contact in Chatwoot
+                let sourceId = sessionStorage.getItem('lorena_chatwoot_source_id');
+                if (!sourceId) {
+                    const contactRes = await fetch(BASE_URL + '/contacts', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            identifier: SESSION_ID,
+                            name: 'Lorena Lliviría (Web)'
+                        })
+                    });
+                    if (!contactRes.ok) throw new Error('Failed to create/get Chatwoot contact: ' + contactRes.status);
+                    const contactData = await contactRes.json();
+                    sourceId = contactData.source_id;
+                    sessionStorage.setItem('lorena_chatwoot_source_id', sourceId);
+                }
+
+                // 2. Get or Create Conversation
+                let conversationId = sessionStorage.getItem('lorena_chatwoot_conversation_id');
+                if (!conversationId) {
+                    // Check if there is an existing conversation
+                    const convListRes = await fetch(BASE_URL + '/contacts/' + sourceId + '/conversations');
+                    if (convListRes.ok) {
+                        const convList = await convListRes.json();
+                        if (convList && convList.length > 0) {
+                            conversationId = convList[0].id;
+                        }
+                    }
+                    
+                    // If no conversation found, create one
+                    if (!conversationId) {
+                        const convCreateRes = await fetch(BASE_URL + '/contacts/' + sourceId + '/conversations', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({})
+                        });
+                        if (!convCreateRes.ok) throw new Error('Failed to create Chatwoot conversation: ' + convCreateRes.status);
+                        const convData = await convCreateRes.json();
+                        conversationId = convData.id;
+                    }
+                    
+                    sessionStorage.setItem('lorena_chatwoot_conversation_id', conversationId);
+                }
+
+                // 3. Send the message
+                const msgRes = await fetch(BASE_URL + '/contacts/' + sourceId + '/conversations/' + conversationId + '/messages', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        identifier: SESSION_ID,
-                        name: 'Lorena Lliviría (Web)',
                         content: content,
-                        message_type: messageType,
-                        private: false
+                        message_type: messageType
                     })
                 });
+                if (!msgRes.ok) throw new Error('Failed to send message to Chatwoot: ' + msgRes.status);
+                
             } catch (error) {
-                console.error('Error sending to Chatwoot:', error);
+                console.error('Error in sendToChatwoot:', error);
             }
         }
 
@@ -227,6 +274,8 @@ document.addEventListener('DOMContentLoaded', () => {
         function clearChatHistory() {
             localStorage.removeItem('lorena_chat_history');
             localStorage.removeItem('lorena_session_id');
+            sessionStorage.removeItem('lorena_chatwoot_source_id');
+            sessionStorage.removeItem('lorena_chatwoot_conversation_id');
             // Regenerate session ID for a fresh conversation
             localStorage.setItem('lorena_session_id', 'session-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9));
             SESSION_ID = localStorage.getItem('lorena_session_id');
