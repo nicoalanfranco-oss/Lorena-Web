@@ -268,7 +268,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         const newConvRes = await fetch(`${CHATWOOT_BASE}/conversations`, {
                             method: 'POST',
                             headers: { 'api_access_token': CHATWOOT_TOKEN, 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ inbox_id: INBOX_ID, contact_id: contactId })
+                            body: JSON.stringify({ inbox_id: INBOX_ID, contact_id: contactId, assignee_id: null })
                         });
                         if (newConvRes.ok) {
                             const newConvData = await newConvRes.json();
