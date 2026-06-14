@@ -273,6 +273,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (newConvRes.ok) {
                             const newConvData = await newConvRes.json();
                             conversationId = newConvData.id;
+                            // Desasignar explícitamente para que no aplique la Default Policy del inbox
+                            await fetch(`${CHATWOOT_BASE}/conversations/${conversationId}/assignments`, {
+                                method: 'POST',
+                                headers: { 'api_access_token': CHATWOOT_TOKEN, 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ assignee_id: null })
+                            });
                         }
                     }
 
