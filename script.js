@@ -196,9 +196,10 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('Chat Session ID:', SESSION_ID);
 
         async function sendToChatwoot(content, messageType) {
-            const CHATWOOT_BASE = 'https://chatwoot.nico-family.com/api/v1/accounts/3';
-            const CHATWOOT_TOKEN = 'tR63WP3g1B65ciHLnuV79r5u';
-            const INBOX_ID = 14;
+            const config = window.LORENA_CONFIG || {};
+            const CHATWOOT_BASE = config.CHATWOOT_BASE || 'https://chatwoot.nico-family.com/api/v1/accounts/3';
+            const CHATWOOT_TOKEN = config.CHATWOOT_TOKEN || 'tR63WP3g1B65ciHLnuV79r5u';
+            const INBOX_ID = config.CHATWOOT_INBOX_ID || 14;
 
             try {
                 // ── PASO 1: Obtener o crear contacto ─────────────────────────────
