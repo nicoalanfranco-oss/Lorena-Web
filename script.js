@@ -198,20 +198,37 @@ document.addEventListener('DOMContentLoaded', () => {
         async function sendToChatwoot(content, messageType) {
             const config = window.LORENA_CONFIG || {};
             const CHATWOOT_PUBLIC_URL = config.CHATWOOT_PUBLIC_URL || 'https://chatwoot.nico-family.com/public/api/v1/inboxes/S4GujY1dBKvvA381tjBpxC5X';
+            const IDENTITY_SECRET = config.CHATWOOT_IDENTITY_SECRET || 'xQb3MSBCn3MmaBYCGuHYXSMM';
 
             // Prefix bot messages so they are distinguishable in Chatwoot
             const finalContent = messageType === 'outgoing' ? `[Asistente]: ${content}` : content;
+
+            // ── Helper: compute HMAC-SHA256 using the browser Web Crypto API ──────
+            async function computeHmac(message, secret) {
+                const enc = new TextEncoder();
+                const key = await window.crypto.subtle.importKey(
+                    'raw', enc.encode(secret),
+                    { name: 'HMAC', hash: 'SHA-256' },
+                    false, ['sign']
+                );
+                const sig = await window.crypto.subtle.sign('HMAC', key, enc.encode(message));
+                return Array.from(new Uint8Array(sig)).map(b => b.toString(16).padStart(2, '0')).join('');
+            }
 
             try {
                 // ── PASO 1: Obtener o crear contacto ─────────────────────────────
                 let contactSourceId = sessionStorage.getItem('lorena_chatwoot_api_contact_source_id');
 
                 if (!contactSourceId) {
+                    // Compute identity hash required by Chatwoot identity validation
+                    const identifierHash = await computeHmac(SESSION_ID, IDENTITY_SECRET);
+
                     const contactRes = await fetch(`${CHATWOOT_PUBLIC_URL}/contacts`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                             identifier: SESSION_ID,
+                            identifier_hash: identifierHash,
                             name: 'Visitante Web'
                         })
                     });
@@ -221,26 +238,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         contactSourceId = contactData.source_id;
                         sessionStorage.setItem('lorena_chatwoot_api_contact_source_id', contactSourceId);
                     } else {
-                        // Si el identifier ya existe en otra bandeja Chatwoot puede devolver 500.
-                        // Solución: generar un session_id nuevo y reintentar una sola vez.
-                        console.warn('[Chatwoot] Error al crear contacto (' + contactRes.status + '). Regenerando session_id y reintentando...');
-                        const newSessionId = 'session-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
-                        localStorage.setItem('lorena_session_id', newSessionId);
-                        SESSION_ID = newSessionId;
-
-                        const retryRes = await fetch(`${CHATWOOT_PUBLIC_URL}/contacts`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                identifier: SESSION_ID,
-                                name: 'Visitante Web'
-                            })
-                        });
-                        if (retryRes.ok) {
-                            const retryData = await retryRes.json();
-                            contactSourceId = retryData.source_id;
-                            sessionStorage.setItem('lorena_chatwoot_api_contact_source_id', contactSourceId);
-                        }
+                        const errText = await contactRes.text();
+                        throw new Error('[Chatwoot] Error al crear contacto: ' + contactRes.status + ' ' + errText);
                     }
                 }
 
@@ -258,6 +257,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         const convData = await convRes.json();
                         conversationId = convData.id;
                         sessionStorage.setItem('lorena_chatwoot_api_conversation_id', conversationId);
+                    } else {
+                        const errText = await convRes.text();
+                        throw new Error('[Chatwoot] Error al crear conversación: ' + convRes.status + ' ' + errText);
                     }
                 }
 
@@ -267,11 +269,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 const msgRes = await fetch(`${CHATWOOT_PUBLIC_URL}/contacts/${contactSourceId}/conversations/${conversationId}/messages`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        content: finalContent
-                    })
+                    body: JSON.stringify({ content: finalContent })
                 });
-                if (!msgRes.ok) throw new Error('[Chatwoot] Error enviando mensaje: ' + msgRes.status);
+                if (!msgRes.ok) {
+                    const errText = await msgRes.text();
+                    throw new Error('[Chatwoot] Error enviando mensaje: ' + msgRes.status + ' ' + errText);
+                }
 
             } catch (error) {
                 console.error('Error in sendToChatwoot:', error);
