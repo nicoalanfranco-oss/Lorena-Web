@@ -329,6 +329,59 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         // ── End Persistence ─────────────────────────────────────────────
 
+        let pollingIntervalId = null;
+
+        async function fetchMessagesFromChatwoot() {
+            const contactSourceId = sessionStorage.getItem('lorena_chatwoot_api_contact_source_id');
+            const conversationId = sessionStorage.getItem('lorena_chatwoot_api_conversation_id');
+            if (!contactSourceId || !conversationId) return;
+
+            const config = window.LORENA_CONFIG || {};
+            const CHATWOOT_PUBLIC_URL = config.CHATWOOT_PUBLIC_URL || 'https://chatwoot.nico-family.com/public/api/v1/inboxes/S4GujY1dBKvvA381tjBpxC5X';
+
+            try {
+                const res = await fetch(`${CHATWOOT_PUBLIC_URL}/contacts/${contactSourceId}/conversations/${conversationId}/messages`);
+                if (res.ok) {
+                    const messages = await res.json();
+                    if (Array.isArray(messages)) {
+                        const history = getHistory();
+                        let updated = false;
+
+                        // Filter only incoming messages that are from agents (message_type === 1 or not user/incoming)
+                        // In public api, message_type is outgoing (1) or template (3) or similar. Let's see:
+                        // Messages sent by user have message_type = 0 (incoming), agent messages are message_type = 1 (outgoing)
+                        messages.forEach(msg => {
+                            // Only care about messages from agents/bot (message_type === 1 or message_type === 'outgoing')
+                            const isBot = msg.message_type === 1 || msg.message_type === 'outgoing';
+                            if (isBot) {
+                                // Check if this message text is already in our history
+                                const alreadyExists = history.some(h => h.text === msg.content && h.sender === 'bot');
+                                if (!alreadyExists) {
+                                    addMessage(msg.content, 'bot');
+                                    updated = true;
+                                }
+                            }
+                        });
+                    }
+                }
+            } catch (err) {
+                console.error('Error polling Chatwoot messages:', err);
+            }
+        }
+
+        function startPolling() {
+            if (pollingIntervalId) return;
+            fetchMessagesFromChatwoot();
+            pollingIntervalId = setInterval(fetchMessagesFromChatwoot, 5000);
+        }
+
+        function stopPolling() {
+            if (pollingIntervalId) {
+                clearInterval(pollingIntervalId);
+                pollingIntervalId = null;
+            }
+        }
+
         let originalScrollY = 0;
 
         function toggleChat() {
@@ -337,6 +390,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if (chatWidget.classList.contains('active')) {
                 history.pushState({ chatOpen: true }, '');
+                startPolling();
                 if (window.innerWidth <= 768) {
                     originalScrollY = window.scrollY;
                     document.body.style.position = 'fixed';
@@ -355,6 +409,7 @@ document.addEventListener('DOMContentLoaded', () => {
         function closeChatUI() {
             chatWidget.classList.remove('active');
             chatbotContainer.classList.remove('chat-active');
+            stopPolling();
             if (window.innerWidth <= 768) {
                 document.body.style.position = '';
                 document.body.style.top = '';
@@ -408,6 +463,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Load previous conversation history on init
         loadChatHistory();
+        startPolling();
 
         async function sendMessage() {
             const text = chatInput.value.trim();
@@ -420,68 +476,8 @@ document.addEventListener('DOMContentLoaded', () => {
             // ── Enviar solo el mensaje del cliente a Chatwoot ────────────────────
             sendToChatwoot(text, 'incoming');
 
-            try {
-                // ── Enviar el mensaje saliente de la automatización a Lorena_Pilates ──
-                const response = await fetch('https://n8n.nico-family.com/webhook/Lorena_Pilates', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        chatInput: text,
-                        sessionId: SESSION_ID,
-                        cliente: 'lorenalliviria',
-                        fuente: 'WEB'
-                    })
-                });
-
-                removeMessage(typingId);
-
-                if (response.ok) {
-                    const rawText = await response.text();
-                    
-                    // Función interna para desempaquetar respuestas JSON de n8n
-                    function extractBotText(raw) {
-                        let value = raw;
-                        for (let i = 0; i < 3; i++) {
-                            if (typeof value !== 'string') break;
-                            const trimmed = value.trim();
-                            if (!trimmed.startsWith('{') && !trimmed.startsWith('[')) break;
-                            try {
-                                const parsed = JSON.parse(trimmed);
-                                const candidate = Array.isArray(parsed)
-                                    ? (parsed[0]?.output ?? parsed[0]?.text ?? parsed[0]?.message)
-                                    : (parsed.output ?? parsed.text ?? parsed.message);
-                                
-                                if (candidate === undefined || candidate === null) break;
-                                value = candidate;
-                            } catch (e) {
-                                break;
-                            }
-                        }
-                        let result = String(value).trim();
-                        if (result.startsWith('{') && result.endsWith('}')) {
-                            let cleaned = result.substring(1, result.length - 1).trim();
-                            if (cleaned.startsWith('"') && cleaned.endsWith('"')) {
-                                cleaned = cleaned.substring(1, cleaned.length - 1).trim();
-                            }
-                            result = cleaned;
-                        }
-                        return result.replace(/\\n/g, '\n');
-                    }
-
-                    const botReply = extractBotText(rawText);
-                    if (botReply) {
-                        addMessage(botReply, 'bot');
-                    } else {
-                        addMessage('¡Gracias por tu mensaje! 😊 Lorena lo verá en breve y te responderá.', 'bot');
-                    }
-                } else {
-                    addMessage('¡Gracias por tu mensaje! 😊 Lorena lo verá en breve y te responderá.', 'bot');
-                }
-            } catch (error) {
-                removeMessage(typingId);
-                console.error('Error fetching webhook:', error);
-                addMessage('¡Gracias por tu mensaje! 😊 Lorena lo verá en breve y te responderá.', 'bot');
-            }
+            removeMessage(typingId);
+            addMessage('¡Gracias por tu mensaje! 😊 Lorena lo verá en breve y te responderá.', 'bot');
         }
 
 
