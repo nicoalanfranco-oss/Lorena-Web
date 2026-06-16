@@ -357,6 +357,9 @@ document.addEventListener('DOMContentLoaded', () => {
                                 // Check if this message text is already in our history
                                 const alreadyExists = history.some(h => h.text === msg.content && h.sender === 'bot');
                                 if (!alreadyExists) {
+                                    // Remove any active typing indicators before adding the new message
+                                    document.querySelectorAll('.message.bot.typing').forEach(el => el.remove());
+                                    
                                     addMessage(msg.content, 'bot');
                                     updated = true;
                                 }
@@ -471,13 +474,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
             addMessage(text, 'user');
             chatInput.value = '';
-            const typingId = addTypingIndicator();
+            
+            // Show typing indicator until Chatwoot responds
+            addTypingIndicator();
 
             // ── Enviar solo el mensaje del cliente a Chatwoot ────────────────────
             sendToChatwoot(text, 'incoming');
-
-            removeMessage(typingId);
-            addMessage('¡Gracias por tu mensaje! 😊 Lorena lo verá en breve y te responderá.', 'bot');
         }
 
 
