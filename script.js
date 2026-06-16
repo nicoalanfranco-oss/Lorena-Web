@@ -204,7 +204,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             try {
                 // ── PASO 1: Obtener o crear contacto ─────────────────────────────
-                let contactSourceId = sessionStorage.getItem('lorena_chatwoot_contact_source_id');
+                let contactSourceId = sessionStorage.getItem('lorena_chatwoot_api_contact_source_id');
 
                 if (!contactSourceId) {
                     const contactRes = await fetch(`${CHATWOOT_PUBLIC_URL}/contacts`, {
@@ -218,14 +218,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (contactRes.ok) {
                         const contactData = await contactRes.json();
                         contactSourceId = contactData.source_id;
-                        sessionStorage.setItem('lorena_chatwoot_contact_source_id', contactSourceId);
+                        sessionStorage.setItem('lorena_chatwoot_api_contact_source_id', contactSourceId);
                     }
                 }
 
                 if (!contactSourceId) throw new Error('[Chatwoot] No se pudo obtener/crear contacto');
 
                 // ── PASO 2: Obtener o crear conversación ─────────────────────────
-                let conversationId = sessionStorage.getItem('lorena_chatwoot_conversation_id');
+                let conversationId = sessionStorage.getItem('lorena_chatwoot_api_conversation_id');
 
                 if (!conversationId) {
                     const convRes = await fetch(`${CHATWOOT_PUBLIC_URL}/contacts/${contactSourceId}/conversations`, {
@@ -235,7 +235,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (convRes.ok) {
                         const convData = await convRes.json();
                         conversationId = convData.id;
-                        sessionStorage.setItem('lorena_chatwoot_conversation_id', conversationId);
+                        sessionStorage.setItem('lorena_chatwoot_api_conversation_id', conversationId);
                     }
                 }
 
@@ -270,8 +270,8 @@ document.addEventListener('DOMContentLoaded', () => {
         function clearChatHistory() {
             localStorage.removeItem('lorena_chat_history');
             localStorage.removeItem('lorena_session_id');
-            sessionStorage.removeItem('lorena_chatwoot_contact_source_id');
-            sessionStorage.removeItem('lorena_chatwoot_conversation_id');
+            sessionStorage.removeItem('lorena_chatwoot_api_contact_source_id');
+            sessionStorage.removeItem('lorena_chatwoot_api_conversation_id');
             // Regenerate session ID for a fresh conversation
             localStorage.setItem('lorena_session_id', 'session-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9));
             SESSION_ID = localStorage.getItem('lorena_session_id');
