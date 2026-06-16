@@ -414,121 +414,20 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!text) return;
 
             addMessage(text, 'user');
-            sendToChatwoot(text, 'incoming');
             chatInput.value = '';
             const typingId = addTypingIndicator();
 
-            try {
-                const response = await fetch('https://n8n.nico-family.com/webhook/3b1ec272-8ba1-4e6f-abf5-a9d567a6e28a/chat', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        chatInput: text,
-                        sessionId: SESSION_ID,
-                        cliente: 'lorenalliviria',
-                        fuente: 'WEB'
-                    })
-                });
+            // ── Enviar solo el mensaje del cliente a Chatwoot ────────────────────
+            sendToChatwoot(text, 'incoming');
 
-                // Always read as text first
-                const rawText = await response.text();
-                removeMessage(typingId);
-                console.log('n8n raw response [status=' + response.status + ']:', rawText);
+            // ── n8n AI webhook suspendido temporalmente ──────────────────────────
+            // TODO: Reactivar cuando se requiera respuesta automática del agente
+            // await fetch('https://n8n.nico-family.com/webhook/3b1ec272-8ba1-4e6f-abf5-a9d567a6e28a/chat', {...});
 
-                if (!response.ok) {
-                    showNotification(
-                        'Error de Conexión',
-                        'No se pudo comunicar con el servidor (HTTP ' + response.status + '). Verificá que n8n esté activo.'
-                    );
-                    return;
-                }
-
-                if (!rawText) {
-                    showNotification(
-                        'Sin Respuesta',
-                        'El agente no devolvió ninguna respuesta. Verificá que el flujo en n8n esté correctamente configurado.'
-                    );
-                    return;
-                }
-
-                // 1. Check if it is NDJSON (streaming format from n8n)
-                let combinedText = '';
-                let isNdjson = false;
-                const lines = rawText.split('\n').filter(line => line.trim() !== '');
-                
-                for (const line of lines) {
-                    try {
-                        const parsedLine = JSON.parse(line);
-                        if (parsedLine && parsedLine.type === 'item' && parsedLine.content !== undefined) {
-                            combinedText += parsedLine.content;
-                            isNdjson = true;
-                        }
-                    } catch (e) {
-                        // Ignore lines that are not valid JSON
-                    }
-                }
-
-                // The text we will try to unwrap
-                let textToProcess = (isNdjson && combinedText) ? combinedText : rawText;
-
-                // 2. Helper: deeply extract the text content from potentially nested JSON responses.
-                function extractBotText(raw) {
-                    let value = raw;
-                    // Keep unwrapping as long as it looks like a JSON string
-                    for (let i = 0; i < 3; i++) {
-                        if (typeof value !== 'string') break;
-                        const trimmed = value.trim();
-                        if (!trimmed.startsWith('{') && !trimmed.startsWith('[')) break;
-                        try {
-                            const parsed = JSON.parse(trimmed);
-                            const candidate = Array.isArray(parsed)
-                                ? (parsed[0]?.output ?? parsed[0]?.text ?? parsed[0]?.message)
-                                : (parsed.output ?? parsed.text ?? parsed.message);
-                            
-                            if (candidate === undefined || candidate === null) break;
-                            value = candidate;
-                        } catch (e) {
-                            break;
-                        }
-                    }
-                    
-                    // Failsafe: If it still looks like it's wrapped in {} but failed parsing (malformed JSON)
-                    let result = String(value).trim();
-                    if (result.startsWith('{') && result.endsWith('}')) {
-                        let cleaned = result.substring(1, result.length - 1).trim();
-                        // If it's also wrapped in quotes, strip them
-                        if (cleaned.startsWith('"') && cleaned.endsWith('"')) {
-                            cleaned = cleaned.substring(1, cleaned.length - 1).trim();
-                        }
-                        result = cleaned;
-                    }
-
-                    // Handle escaped newlines if they are literal \n strings
-                    result = result.replace(/\\n/g, '\n');
-
-                    return result;
-                }
-
-                let botReply = extractBotText(textToProcess);
-
-                // Helper: strip all "Calling <tool> with input: {...}" traces from n8n
-                function stripToolTraces(text) {
-                    return text.replace(/Calling\s+[\w-]+\s+with\s+input:\s*\{[^{}]*\}/g, '').trim();
-                }
-
-                const cleanedReply = stripToolTraces(botReply);
-                addMessage(cleanedReply, 'bot');
-                sendToChatwoot(cleanedReply, 'outgoing');
-
-            } catch (error) {
-                removeMessage(typingId);
-                console.error('Chat fetch error:', error.name, error.message, error);
-                showNotification(
-                    'Error de Sistema',
-                    'Hubo un problema técnico al enviar el mensaje: ' + error.name + ' — ' + error.message
-                );
-            }
+            removeMessage(typingId);
+            addMessage('¡Gracias por tu mensaje! 😊 Lorena lo verá en breve y te responderá.', 'bot');
         }
+
 
         chatSend.addEventListener('click', sendMessage);
         chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
