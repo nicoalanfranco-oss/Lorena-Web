@@ -215,10 +215,32 @@ document.addEventListener('DOMContentLoaded', () => {
                             name: 'Visitante Web'
                         })
                     });
+
                     if (contactRes.ok) {
                         const contactData = await contactRes.json();
                         contactSourceId = contactData.source_id;
                         sessionStorage.setItem('lorena_chatwoot_api_contact_source_id', contactSourceId);
+                    } else {
+                        // Si el identifier ya existe en otra bandeja Chatwoot puede devolver 500.
+                        // Solución: generar un session_id nuevo y reintentar una sola vez.
+                        console.warn('[Chatwoot] Error al crear contacto (' + contactRes.status + '). Regenerando session_id y reintentando...');
+                        const newSessionId = 'session-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+                        localStorage.setItem('lorena_session_id', newSessionId);
+                        SESSION_ID = newSessionId;
+
+                        const retryRes = await fetch(`${CHATWOOT_PUBLIC_URL}/contacts`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                identifier: SESSION_ID,
+                                name: 'Visitante Web'
+                            })
+                        });
+                        if (retryRes.ok) {
+                            const retryData = await retryRes.json();
+                            contactSourceId = retryData.source_id;
+                            sessionStorage.setItem('lorena_chatwoot_api_contact_source_id', contactSourceId);
+                        }
                     }
                 }
 
