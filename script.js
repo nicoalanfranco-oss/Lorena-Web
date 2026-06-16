@@ -420,12 +420,68 @@ document.addEventListener('DOMContentLoaded', () => {
             // ── Enviar solo el mensaje del cliente a Chatwoot ────────────────────
             sendToChatwoot(text, 'incoming');
 
-            // ── n8n AI webhook suspendido temporalmente ──────────────────────────
-            // TODO: Reactivar cuando se requiera respuesta automática del agente
-            // await fetch('https://n8n.nico-family.com/webhook/3b1ec272-8ba1-4e6f-abf5-a9d567a6e28a/chat', {...});
+            try {
+                // ── Enviar el mensaje saliente de la automatización a Lorena_Pilates ──
+                const response = await fetch('https://n8n.nico-family.com/webhook/Lorena_Pilates', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chatInput: text,
+                        sessionId: SESSION_ID,
+                        cliente: 'lorenalliviria',
+                        fuente: 'WEB'
+                    })
+                });
 
-            removeMessage(typingId);
-            addMessage('¡Gracias por tu mensaje! 😊 Lorena lo verá en breve y te responderá.', 'bot');
+                removeMessage(typingId);
+
+                if (response.ok) {
+                    const rawText = await response.text();
+                    
+                    // Función interna para desempaquetar respuestas JSON de n8n
+                    function extractBotText(raw) {
+                        let value = raw;
+                        for (let i = 0; i < 3; i++) {
+                            if (typeof value !== 'string') break;
+                            const trimmed = value.trim();
+                            if (!trimmed.startsWith('{') && !trimmed.startsWith('[')) break;
+                            try {
+                                const parsed = JSON.parse(trimmed);
+                                const candidate = Array.isArray(parsed)
+                                    ? (parsed[0]?.output ?? parsed[0]?.text ?? parsed[0]?.message)
+                                    : (parsed.output ?? parsed.text ?? parsed.message);
+                                
+                                if (candidate === undefined || candidate === null) break;
+                                value = candidate;
+                            } catch (e) {
+                                break;
+                            }
+                        }
+                        let result = String(value).trim();
+                        if (result.startsWith('{') && result.endsWith('}')) {
+                            let cleaned = result.substring(1, result.length - 1).trim();
+                            if (cleaned.startsWith('"') && cleaned.endsWith('"')) {
+                                cleaned = cleaned.substring(1, cleaned.length - 1).trim();
+                            }
+                            result = cleaned;
+                        }
+                        return result.replace(/\\n/g, '\n');
+                    }
+
+                    const botReply = extractBotText(rawText);
+                    if (botReply) {
+                        addMessage(botReply, 'bot');
+                    } else {
+                        addMessage('¡Gracias por tu mensaje! 😊 Lorena lo verá en breve y te responderá.', 'bot');
+                    }
+                } else {
+                    addMessage('¡Gracias por tu mensaje! 😊 Lorena lo verá en breve y te responderá.', 'bot');
+                }
+            } catch (error) {
+                removeMessage(typingId);
+                console.error('Error fetching webhook:', error);
+                addMessage('¡Gracias por tu mensaje! 😊 Lorena lo verá en breve y te responderá.', 'bot');
+            }
         }
 
 
