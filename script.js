@@ -297,6 +297,8 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.removeItem('lorena_session_id');
             sessionStorage.removeItem('lorena_chatwoot_api_contact_source_id');
             sessionStorage.removeItem('lorena_chatwoot_api_conversation_id');
+            sessionStorage.removeItem('lorena_last_seen_msg_id');
+            lastSeenMessageId = 0;
             // Regenerate session ID for a fresh conversation
             localStorage.setItem('lorena_session_id', 'session-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9));
             SESSION_ID = localStorage.getItem('lorena_session_id');
@@ -330,52 +332,45 @@ document.addEventListener('DOMContentLoaded', () => {
         // ── End Persistence ─────────────────────────────────────────────
 
         let pollingIntervalId = null;
+        // Cursor: último ID de mensaje ya procesado (evita duplicados sin comparar texto)
+        let lastSeenMessageId = parseInt(sessionStorage.getItem('lorena_last_seen_msg_id') || '0', 10);
 
-        async function fetchMessagesFromChatwoot() {
-            const contactSourceId = sessionStorage.getItem('lorena_chatwoot_api_contact_source_id');
+        const API_MESSAGES_URL = `${API_BASE}/api/web/messages`;
+
+        async function fetchAgentMessages() {
             const conversationId = sessionStorage.getItem('lorena_chatwoot_api_conversation_id');
-            if (!contactSourceId || !conversationId) return;
-
-            const config = window.LORENA_CONFIG || {};
-            const CHATWOOT_PUBLIC_URL = config.CHATWOOT_PUBLIC_URL || 'https://chatwoot.nico-family.com/public/api/v1/inboxes/S4GujY1dBKvvA381tjBpxC5X';
+            if (!conversationId) return; // Sin conversación activa, nada que hacer
 
             try {
-                const res = await fetch(`${CHATWOOT_PUBLIC_URL}/contacts/${contactSourceId}/conversations/${conversationId}/messages`);
-                if (res.ok) {
-                    const messages = await res.json();
-                    if (Array.isArray(messages)) {
-                        const history = getHistory();
-                        let updated = false;
+                const res = await fetch(
+                    `${API_MESSAGES_URL}?conversation_id=${conversationId}&after_id=${lastSeenMessageId}`
+                );
+                if (!res.ok) return;
 
-                        // Filter only incoming messages that are from agents (message_type === 1 or not user/incoming)
-                        // In public api, message_type is outgoing (1) or template (3) or similar. Let's see:
-                        // Messages sent by user have message_type = 0 (incoming), agent messages are message_type = 1 (outgoing)
-                        messages.forEach(msg => {
-                            // Only care about messages from agents/bot (message_type === 1 or message_type === 'outgoing')
-                            const isBot = msg.message_type === 1 || msg.message_type === 'outgoing';
-                            if (isBot) {
-                                // Check if this message text is already in our history
-                                const alreadyExists = history.some(h => h.text === msg.content && h.sender === 'bot');
-                                if (!alreadyExists) {
-                                    // Remove any active typing indicators before adding the new message
-                                    document.querySelectorAll('.message.bot.typing').forEach(el => el.remove());
-                                    
-                                    addMessage(msg.content, 'bot');
-                                    updated = true;
-                                }
-                            }
-                        });
+                const messages = await res.json();
+                if (!Array.isArray(messages) || messages.length === 0) return;
+
+                // Quitar typing indicators antes de mostrar nuevos mensajes
+                document.querySelectorAll('.message.bot.typing').forEach(el => el.remove());
+
+                messages.forEach(msg => {
+                    addMessage(msg.content, 'bot');
+                    // Avanzar el cursor
+                    if (msg.id > lastSeenMessageId) {
+                        lastSeenMessageId = msg.id;
+                        sessionStorage.setItem('lorena_last_seen_msg_id', lastSeenMessageId);
                     }
-                }
+                });
+
             } catch (err) {
-                console.error('Error polling Chatwoot messages:', err);
+                console.error('Error polling agent messages:', err);
             }
         }
 
         function startPolling() {
             if (pollingIntervalId) return;
-            fetchMessagesFromChatwoot();
-            pollingIntervalId = setInterval(fetchMessagesFromChatwoot, 5000);
+            fetchAgentMessages();
+            pollingIntervalId = setInterval(fetchAgentMessages, 4000);
         }
 
         function stopPolling() {
