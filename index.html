@@ -62,6 +62,17 @@
                 <div class="navbar-brand">
                     <span class="brand-text shadow-text">LORENA LLIVIRÍA</span>
                 </div>
+                
+                <!-- Instagram-style Story widget -->
+                <div class="story-widget-container" id="story-widget" title="Novedades">
+                    <div class="story-ring active">
+                        <div class="story-avatar">
+                            <span class="material-symbols-outlined text-[#00bdd6] text-xl">event_note</span>
+                        </div>
+                    </div>
+                    <span class="story-label">Horarios</span>
+                </div>
+
                 <ul class="nav-links">
                     <li><a href="#hero">Inicio</a></li>
                     <li><a href="#enfoque">Enfoque</a></li>
@@ -733,6 +744,49 @@
         <button class="chat-toggle" id="chat-toggle">
             <span class="material-symbols-outlined text-3xl">smart_toy</span>
         </button>
+
+        <!-- Instagram Story Popup Modal -->
+        <div id="promo-story-modal" class="story-modal-overlay">
+            <div class="story-modal-container">
+                <!-- Top Progress Bars -->
+                <div class="story-progress-container">
+                    <div class="story-progress-bar"><div class="story-progress-fill"></div></div>
+                    <div class="story-progress-bar"><div class="story-progress-fill"></div></div>
+                    <div class="story-progress-bar"><div class="story-progress-fill"></div></div>
+                </div>
+
+                <!-- Header info -->
+                <div class="story-header">
+                    <div class="story-avatar-small">
+                        <img src="logo-500.png" alt="Lorena Logo">
+                    </div>
+                    <div class="story-info">
+                        <span class="story-username">lorena_lliviria</span>
+                        <span class="story-time">Novedades</span>
+                    </div>
+                    <button class="story-close-btn" id="promo-close-btn">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+
+                <!-- Story Slides Content -->
+                <div class="story-slides-wrapper">
+                    <div class="story-slide active">
+                        <img src="promo1.jpg" alt="Nuevos Horarios">
+                    </div>
+                    <div class="story-slide">
+                        <img src="promo2.jpg" alt="Horarios Específicos">
+                    </div>
+                    <div class="story-slide">
+                        <img src="promo3.jpg" alt="Cupos Limitados">
+                    </div>
+                </div>
+
+                <!-- Left/Right Tap Zones for Navigation -->
+                <div class="story-nav-zone left" id="story-prev-zone"></div>
+                <div class="story-nav-zone right" id="story-next-zone"></div>
+            </div>
+        </div>
     </div>
 
     <script src="config.js"></script>

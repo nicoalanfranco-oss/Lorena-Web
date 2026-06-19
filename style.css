@@ -1367,4 +1367,267 @@ header {
 @keyframes fadeInUp {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
-}
+}
+
+/* ============================================
+   INSTAGRAM STORIES WIDGET & MODAL POPUP
+   ============================================ */
+
+/* 1. Story Circle in Navbar */
+.story-widget-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    margin-left: 15px;
+    margin-right: 15px;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.story-widget-container:hover {
+    transform: scale(1.08);
+}
+
+.story-ring {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    padding: 2.5px;
+    background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* If already viewed, remove the colorful gradient ring */
+.story-ring.viewed {
+    background: #cbd5e1;
+}
+
+.story-avatar {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: white;
+    border: 2px solid white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #00bdd6;
+    box-shadow: inset 0 0 4px rgba(0,0,0,0.1);
+}
+
+.story-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #424242;
+    margin-top: 3px;
+}
+
+/* Hide on very small headers if space is tight, or adapt */
+@media (max-width: 640px) {
+    .story-widget-container {
+        margin-left: 5px;
+        margin-right: 5px;
+    }
+    .story-ring {
+        width: 38px;
+        height: 38px;
+        padding: 2px;
+    }
+    .story-label {
+        font-size: 0.55rem;
+    }
+}
+
+/* 2. Full-screen Stories Modal Overlay */
+.story-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    z-index: 9999999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+}
+
+.story-modal-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+/* Container matching smartphone aspect ratio */
+.story-modal-container {
+    width: 100%;
+    max-width: 440px;
+    height: 100%;
+    max-height: 800px;
+    position: relative;
+    background: #000;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+    display: flex;
+    flex-direction: column;
+}
+
+@media (max-height: 820px) or (max-width: 480px) {
+    .story-modal-container {
+        border-radius: 0;
+        max-height: 100%;
+    }
+}
+
+/* 3. Top Progress Indicators */
+.story-progress-container {
+    position: absolute;
+    top: 15px;
+    left: 0;
+    width: 100%;
+    padding: 0 10px;
+    display: flex;
+    gap: 5px;
+    z-index: 10;
+}
+
+.story-progress-bar {
+    height: 3px;
+    flex: 1;
+    background: rgba(255, 255, 255, 0.35);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.story-progress-fill {
+    height: 100%;
+    width: 0%;
+    background: #ffffff;
+    transition: width 0.1s linear;
+}
+
+/* Active slide progress behavior is managed via JS */
+
+/* 4. Story Header */
+.story-header {
+    position: absolute;
+    top: 28px;
+    left: 0;
+    width: 100%;
+    padding: 0 15px;
+    display: flex;
+    align-items: center;
+    z-index: 10;
+}
+
+.story-avatar-small {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 1.5px solid #00bdd6;
+    background: white;
+}
+
+.story-avatar-small img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.story-info {
+    margin-left: 10px;
+    display: flex;
+    flex-direction: column;
+}
+
+.story-username {
+    color: #ffffff;
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+.story-time {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+.story-close-btn {
+    margin-left: auto;
+    background: none;
+    border: none;
+    color: #ffffff;
+    cursor: pointer;
+    opacity: 0.8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.2s;
+}
+
+.story-close-btn:hover {
+    opacity: 1;
+}
+
+/* 5. Slides Content */
+.story-slides-wrapper {
+    flex: 1;
+    position: relative;
+}
+
+.story-slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.story-slide.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.story-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* 6. Navigation Tap Zones */
+.story-nav-zone {
+    position: absolute;
+    top: 80px;
+    bottom: 0;
+    width: 40%;
+    z-index: 5;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.story-nav-zone.left {
+    left: 0;
+}
+
+.story-nav-zone.right {
+    right: 0;
+    width: 60%; /* Prefer right tap area */
+}
+

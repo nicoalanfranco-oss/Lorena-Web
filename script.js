@@ -728,4 +728,132 @@ document.addEventListener('DOMContentLoaded', () => {
 
         contactObserver.observe(contactSection);
     }
+
+    // --- Instagram Stories Promo Logic ---
+    const storyModal = document.getElementById('promo-story-modal');
+    const storyWidget = document.getElementById('story-widget');
+    const storyRing = storyWidget ? storyWidget.querySelector('.story-ring') : null;
+    const promoCloseBtn = document.getElementById('promo-close-btn');
+    const slides = Array.from(document.querySelectorAll('.story-slide'));
+    const progressFills = Array.from(document.querySelectorAll('.story-progress-fill'));
+    const tapLeft = document.getElementById('story-prev-zone');
+    const tapRight = document.getElementById('story-next-zone');
+
+    let currentSlideIndex = 0;
+    let storyTimer = null;
+    let progressInterval = null;
+    let progressPercent = 0;
+    const slideDuration = 5000; // 5 seconds per slide
+    const progressStepTime = 50; // update progress fill every 50ms
+
+    // Mark as viewed in localStorage if already seen once
+    if (localStorage.getItem('lorena_story_viewed') && storyRing) {
+        storyRing.classList.add('viewed');
+    }
+
+    function openStoryModal() {
+        if (!storyModal) return;
+        currentSlideIndex = 0;
+        storyModal.classList.add('active');
+        showSlide(currentSlideIndex);
+        
+        // Remove gradient color ring to indicate viewed
+        if (storyRing) {
+            storyRing.classList.add('viewed');
+            localStorage.setItem('lorena_story_viewed', 'true');
+        }
+    }
+
+    function closeStoryModal() {
+        if (!storyModal) return;
+        storyModal.classList.remove('active');
+        clearTimers();
+    }
+
+    function showSlide(index) {
+        clearTimers();
+        currentSlideIndex = index;
+
+        // Active slide visibility
+        slides.forEach((slide, i) => {
+            if (i === index) {
+                slide.classList.add('active');
+            } else {
+                slide.classList.remove('active');
+            }
+        });
+
+        // Set progress bars state
+        progressFills.forEach((fill, i) => {
+            if (i < index) {
+                fill.style.width = '100%';
+            } else if (i > index) {
+                fill.style.width = '0%';
+            } else {
+                fill.style.width = '0%';
+            }
+        });
+
+        // Animate progress fill for current slide
+        progressPercent = 0;
+        const totalSteps = slideDuration / progressStepTime;
+        progressInterval = setInterval(() => {
+            progressPercent += 100 / totalSteps;
+            if (progressPercent >= 100) {
+                progressFills[index].style.width = '100%';
+                clearInterval(progressInterval);
+                nextSlide();
+            } else {
+                progressFills[index].style.width = `${progressPercent}%`;
+            }
+        }, progressStepTime);
+    }
+
+    function nextSlide() {
+        if (currentSlideIndex < slides.length - 1) {
+            showSlide(currentSlideIndex + 1);
+        } else {
+            closeStoryModal();
+        }
+    }
+
+    function prevSlide() {
+        if (currentSlideIndex > 0) {
+            showSlide(currentSlideIndex - 1);
+        } else {
+            // Re-start current slide if first slide
+            showSlide(0);
+        }
+    }
+
+    function clearTimers() {
+        if (progressInterval) {
+            clearInterval(progressInterval);
+            progressInterval = null;
+        }
+    }
+
+    // Auto trigger popup after 3 seconds on page load
+    setTimeout(() => {
+        // Only auto-trigger once per browser session
+        if (!sessionStorage.getItem('lorena_story_auto_triggered')) {
+            sessionStorage.setItem('lorena_story_auto_triggered', 'true');
+            openStoryModal();
+        }
+    }, 3000);
+
+    // Event listeners
+    if (storyWidget) storyWidget.addEventListener('click', openStoryModal);
+    if (promoCloseBtn) promoCloseBtn.addEventListener('click', closeStoryModal);
+    if (tapLeft) tapLeft.addEventListener('click', prevSlide);
+    if (tapRight) tapRight.addEventListener('click', nextSlide);
+
+    // Close when clicking outside container
+    if (storyModal) {
+        storyModal.addEventListener('click', (e) => {
+            if (e.target === storyModal) {
+                closeStoryModal();
+            }
+        });
+    }
 });
