@@ -424,7 +424,19 @@
                     <!-- Section Title -->
                     <div class="reveal-bottom mb-12">
                         <h2 class="text-4xl font-black text-professional-grey mb-4">Horarios de Pilates</h2>
-                        <p class="text-lg text-professional-grey/70 max-w-2xl">Nuestra asistente virtual <strong class="text-[#00bdd6]">Loreley</strong> está disponible 24/7 para coordinar tu cita. WhatsApp: <strong class="text-[#00bdd6]">099 707 544</strong> (solo mensajes).</p>
+                        <p class="text-lg text-professional-grey/70 max-w-2xl mb-8">Nuestra asistente virtual <strong class="text-[#00bdd6]">Loreley</strong> está disponible 24/7 para coordinar tu cita.</p>
+
+                        <!-- WhatsApp Box -->
+                        <a href="https://wa.me/59899707544" target="_blank" rel="noopener noreferrer" 
+                           class="inline-flex items-center gap-4 bg-gradient-to-r from-[#25D366] to-[#128C7E] p-4 pr-6 rounded-2xl shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 group">
+                            <div class="bg-white p-3 rounded-xl flex items-center justify-center text-[#25D366] group-hover:scale-110 transition-transform">
+                                <i class="fab fa-whatsapp text-3xl"></i>
+                            </div>
+                            <div class="text-left">
+                                <p class="text-white/90 text-sm font-bold uppercase tracking-wider mb-0.5">Escríbenos por WhatsApp</p>
+                                <p class="text-white text-xl font-black tracking-tight">099 707 544 <span class="text-sm font-normal opacity-80 ml-1">(solo mensajes)</span></p>
+                            </div>
+                        </a>
                     </div>
 
                     <!-- Schedule Grid -->
@@ -586,21 +598,10 @@
                     riesgo de lesiones.</p>
 
                 <h4 class="text-2xl font-bold text-[#00bdd6] mb-4 mt-8">Nuestros Planes</h4>
-                <div class="bg-soft-grey rounded-xl overflow-hidden border border-gray-200">
-                    <table class="w-full text-left">
-                        <thead class="bg-gray-100 font-bold border-b">
-                            <tr>
-                                <th class="p-4">Frecuencia</th>
-                                <th class="p-4">Inversión Mensual</th>
-                            </tr>
-                        </thead>
-                        <tbody id="precios-dynamic-container">
-                            <!-- Los precios se cargarán dinámicamente -->
-                            <tr>
-                                <td colspan="2" class="p-8 text-center text-professional-grey/40 italic">Cargando planes vigentes...</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <!-- Cards de precios animadas (JS las llena y las rota) -->
+                <div id="precios-cards-container" class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+                    <!-- JS populates this -->
+                    <div class="col-span-3 p-6 text-center text-professional-grey/40 italic text-sm">Cargando planes vigentes...</div>
                 </div>
 
                 <div class="mt-8">
@@ -717,7 +718,7 @@
     </div>
 
     <script src="config.js"></script>
-    <script src="script.js?v=1.8"></script>
+    <script src="script.js?v=1.9"></script>
 </body>
 
 </html>

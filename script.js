@@ -77,7 +77,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (clase) {
                     const act = clase.nombre_actividad || 'Pilates';
                     const dur = clase.duracion_min ? `${clase.duracion_min}m` : '';
-                    const cupos = clase.cupos_disponibles != null ? `${clase.cupos_disponibles} cupos` : '';
+                    const cupos = clase.cupos_disponibles != null 
+                        ? (clase.cupos_disponibles <= 0 ? 'SIN CUPOS' : `${clase.cupos_disponibles} cupos`) 
+                        : '';
                     const cellStyle = getCellStyle(act);
                     html += `<div style="${cellStyle} border-radius:10px; padding:10px 6px; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:60px; cursor:pointer; transition:transform .2s, box-shadow .2s; box-shadow: 0 2px 8px rgba(0,189,214,0.15);" onmouseenter="this.style.transform='scale(1.05)';this.style.boxShadow='0 6px 20px rgba(0,189,214,0.35)'" onmouseleave="this.style.transform='scale(1)';this.style.boxShadow='0 2px 8px rgba(0,189,214,0.15)'" onclick="document.getElementById('contacto').scrollIntoView({behavior:'smooth'})">
                         <span>${act}</span>
@@ -94,20 +96,73 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderDynamicPrices(precios) {
-        const container = document.getElementById('precios-dynamic-container');
+        const container = document.getElementById('precios-cards-container');
         if (!container) return;
 
-        if (precios.length === 0) {
-            container.innerHTML = '<tr><td colspan="2" class="p-8 text-center">Consultar precios por privado.</td></tr>';
+        if (!precios || precios.length === 0) {
+            container.innerHTML = '<div class="col-span-3 p-6 text-center text-professional-grey/40 italic text-sm">Consultar precios por privado.</div>';
             return;
         }
 
-        container.innerHTML = precios.map((p, i) => `
-            <tr class="${i < precios.length - 1 ? 'border-b' : ''}">
-                <td class="p-4">${p.modalidad}</td>
-                <td class="p-4 font-bold text-[#00bdd6]">$ ${Math.round(p.ultimo_precio).toLocaleString('es-UY')}</td>
-            </tr>
-        `).join('');
+        // Build card HTML
+        container.innerHTML = precios.map((p, i) => {
+            const precio = Math.round(p.ultimo_precio || 0);
+            return `
+            <article class="precio-card relative flex flex-col rounded-2xl border border-gray-200 bg-white p-6 transition-all duration-500 overflow-hidden"
+                     style="border-top: 3px solid #00bdd6;">
+                <div class="precio-badge hidden absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#00bdd6] to-[#007a8a] text-white px-4 py-1 rounded-full text-[11px] font-bold uppercase tracking-widest z-20 shadow-lg whitespace-nowrap">
+                    MÁS ELEGIDO
+                </div>
+                <div class="mb-4">
+                    <p class="text-xs font-bold uppercase tracking-widest text-[#00bdd6] mb-1">Plan</p>
+                    <h3 class="precio-titulo text-lg font-black text-professional-grey">${p.modalidad}</h3>
+                </div>
+                <div class="flex items-baseline gap-1 mb-4">
+                    <span class="precio-valor text-3xl font-black text-professional-grey">$ ${precio.toLocaleString('es-UY')}</span>
+                    <span class="text-professional-grey/60 text-sm">/ mes</span>
+                </div>
+                <button class="precio-btn mt-auto w-full py-2.5 rounded-xl border border-[#00bdd6] text-[#00bdd6] text-sm font-bold uppercase tracking-wide hover:bg-[#00bdd6]/5 transition-colors"
+                        onclick="document.getElementById('modal-pilates').classList.remove('active'); document.getElementById('contacto').scrollIntoView({behavior:'smooth'});">
+                    Empezar
+                </button>
+            </article>`;
+        }).join('');
+
+        // --- Rotating highlight (like JPS) ---
+        const cards = container.querySelectorAll('.precio-card');
+        let activeIdx = Math.floor(precios.length / 2); // start on middle card
+
+        function updateHighlight(idx) {
+            cards.forEach((card, i) => {
+                const badge = card.querySelector('.precio-badge');
+                const btn   = card.querySelector('.precio-btn');
+                if (i === idx) {
+                    card.style.transform   = 'translateY(-12px) scale(1.04)';
+                    card.style.borderColor = '#00bdd6';
+                    card.style.boxShadow   = '0 8px 32px rgba(0,189,214,0.25)';
+                    card.style.zIndex      = '10';
+                    if (badge) badge.classList.remove('hidden');
+                    if (btn) {
+                        btn.className = 'precio-btn mt-auto w-full py-2.5 rounded-xl bg-gradient-to-r from-[#00bdd6] to-[#007a8a] text-white text-sm font-bold uppercase tracking-wide transition-all duration-300 hover:opacity-90';
+                    }
+                } else {
+                    card.style.transform   = 'translateY(0) scale(1)';
+                    card.style.borderColor = '';
+                    card.style.boxShadow   = '';
+                    card.style.zIndex      = '1';
+                    if (badge) badge.classList.add('hidden');
+                    if (btn) {
+                        btn.className = 'precio-btn mt-auto w-full py-2.5 rounded-xl border border-[#00bdd6] text-[#00bdd6] text-sm font-bold uppercase tracking-wide hover:bg-[#00bdd6]/5 transition-colors';
+                    }
+                }
+            });
+        }
+
+        updateHighlight(activeIdx);
+        setInterval(() => {
+            activeIdx = (activeIdx + 1) % cards.length;
+            updateHighlight(activeIdx);
+        }, 3500);
     }
 
     function calcularFin(horaStr, duracionMin) {
