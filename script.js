@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (preciosRes.ok) {
                 const precios = await preciosRes.json();
                 renderDynamicPrices(precios || []);
+                renderPrecioBadge(precios || []);
             } else {
                 console.error('Error cargando precios:', preciosRes.status);
             }
@@ -77,14 +78,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (clase) {
                     const act = clase.nombre_actividad || 'Pilates';
                     const dur = clase.duracion_min ? `${clase.duracion_min}m` : '';
-                    const cupos = clase.cupos_disponibles != null 
-                        ? (clase.cupos_disponibles <= 0 ? 'SIN CUPOS' : `${clase.cupos_disponibles} cupos`) 
+                    const sinCupos = clase.cupos_disponibles != null && clase.cupos_disponibles <= 0;
+                    const cuposLabel = clase.cupos_disponibles != null
+                        ? (sinCupos ? 'SIN CUPOS' : `${clase.cupos_disponibles} cupos`)
                         : '';
-                    const cellStyle = getCellStyle(act);
-                    html += `<div style="${cellStyle} border-radius:10px; padding:10px 6px; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:60px; cursor:pointer; transition:transform .2s, box-shadow .2s; box-shadow: 0 2px 8px rgba(0,189,214,0.15);" onmouseenter="this.style.transform='scale(1.05)';this.style.boxShadow='0 6px 20px rgba(0,189,214,0.35)'" onmouseleave="this.style.transform='scale(1)';this.style.boxShadow='0 2px 8px rgba(0,189,214,0.15)'" onclick="document.getElementById('contacto').scrollIntoView({behavior:'smooth'})">
+
+                    // Cells WITH availability: vibrant cyan gradient + full opacity
+                    // Cells WITHOUT availability: desaturated grey-blue + lower opacity, strikethrough feel
+                    const cellStyle = sinCupos
+                        ? 'background: linear-gradient(135deg,#b0c4ce,#8fa8b5); color:rgba(255,255,255,0.7); opacity:0.6;'
+                        : getCellStyle(act);
+                    const shadowStyle = sinCupos
+                        ? 'box-shadow: none;'
+                        : 'box-shadow: 0 2px 8px rgba(0,189,214,0.20);';
+                    const hoverIn  = sinCupos ? '' : `this.style.transform='scale(1.05)';this.style.boxShadow='0 6px 20px rgba(0,189,214,0.35)'`;
+                    const hoverOut = sinCupos ? '' : `this.style.transform='scale(1)';this.style.boxShadow='0 2px 8px rgba(0,189,214,0.20)'`;
+                    const cursor   = sinCupos ? 'default' : 'pointer';
+                    const onclick  = sinCupos ? '' : `onclick="document.getElementById('contacto').scrollIntoView({behavior:'smooth'})"`;
+
+                    html += `<div style="${cellStyle} ${shadowStyle} border-radius:10px; padding:10px 6px; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:60px; cursor:${cursor}; transition:transform .2s, box-shadow .2s;" onmouseenter="${hoverIn}" onmouseleave="${hoverOut}" ${onclick}>
                         <span>${act}</span>
                         ${dur ? `<span style="font-size:9px;opacity:0.85;font-weight:400;margin-top:3px;">${dur}</span>` : ''}
-                        ${cupos ? `<span style="font-size:9px;opacity:0.75;font-weight:400;">${cupos}</span>` : ''}
+                        ${cuposLabel ? `<span style="font-size:9px;opacity:0.85;font-weight:600;margin-top:2px;">${cuposLabel}</span>` : ''}
                     </div>`;
                 } else {
                     html += '<div></div>';
@@ -104,13 +119,13 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // Build card HTML
+        // Build card HTML — overflow-visible so badge pops above
         container.innerHTML = precios.map((p, i) => {
             const precio = Math.round(p.ultimo_precio || 0);
             return `
-            <article class="precio-card relative flex flex-col rounded-2xl border border-gray-200 bg-white p-6 transition-all duration-500 overflow-hidden"
-                     style="border-top: 3px solid #00bdd6;">
-                <div class="precio-badge hidden absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#00bdd6] to-[#007a8a] text-white px-4 py-1 rounded-full text-[11px] font-bold uppercase tracking-widest z-20 shadow-lg whitespace-nowrap">
+            <article class="precio-card relative flex flex-col rounded-2xl border border-gray-200 bg-white p-6 transition-all duration-500"
+                     style="border-top: 3px solid #00bdd6; overflow: visible;">
+                <div class="precio-badge" style="display:none; position:absolute; top:-14px; left:50%; transform:translateX(-50%); background:linear-gradient(90deg,#00bdd6,#007a8a); color:#fff; padding:4px 16px; border-radius:999px; font-size:10px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; white-space:nowrap; z-index:30; box-shadow:0 4px 12px rgba(0,189,214,0.4);">
                     MÁS ELEGIDO
                 </div>
                 <div class="mb-4">
@@ -137,22 +152,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 const badge = card.querySelector('.precio-badge');
                 const btn   = card.querySelector('.precio-btn');
                 if (i === idx) {
-                    card.style.transform   = 'translateY(-12px) scale(1.04)';
+                    card.style.transform   = 'translateY(-14px) scale(1.04)';
                     card.style.borderColor = '#00bdd6';
                     card.style.boxShadow   = '0 8px 32px rgba(0,189,214,0.25)';
                     card.style.zIndex      = '10';
-                    if (badge) badge.classList.remove('hidden');
+                    if (badge) badge.style.display = 'block';
                     if (btn) {
-                        btn.className = 'precio-btn mt-auto w-full py-2.5 rounded-xl bg-gradient-to-r from-[#00bdd6] to-[#007a8a] text-white text-sm font-bold uppercase tracking-wide transition-all duration-300 hover:opacity-90';
+                        btn.className = 'precio-btn mt-auto w-full py-2.5 rounded-xl text-white text-sm font-bold uppercase tracking-wide transition-all duration-300 hover:opacity-90';
+                        btn.style.background = 'linear-gradient(90deg,#00bdd6,#007a8a)';
                     }
                 } else {
                     card.style.transform   = 'translateY(0) scale(1)';
                     card.style.borderColor = '';
                     card.style.boxShadow   = '';
                     card.style.zIndex      = '1';
-                    if (badge) badge.classList.add('hidden');
+                    if (badge) badge.style.display = 'none';
                     if (btn) {
                         btn.className = 'precio-btn mt-auto w-full py-2.5 rounded-xl border border-[#00bdd6] text-[#00bdd6] text-sm font-bold uppercase tracking-wide hover:bg-[#00bdd6]/5 transition-colors';
+                        btn.style.background = '';
                     }
                 }
             });
@@ -162,6 +179,43 @@ document.addEventListener('DOMContentLoaded', () => {
         setInterval(() => {
             activeIdx = (activeIdx + 1) % cards.length;
             updateHighlight(activeIdx);
+        }, 3500);
+    }
+
+    // --- Mini rotating price badge under schedule ---
+    function renderPrecioBadge(precios) {
+        const badge = document.getElementById('horarios-precio-badge');
+        if (!badge || !precios || precios.length === 0) return;
+
+        let idx = 0;
+
+        function show(i) {
+            const p = precios[i];
+            const precio = Math.round(p.ultimo_precio || 0);
+            badge.innerHTML = `
+                <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#00bdd6,#007a8a);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <span style="color:#fff;font-size:18px;" class="material-symbols-outlined">calendar_month</span>
+                </div>
+                <div style="flex:1;">
+                    <p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#00bdd6;margin:0 0 2px;">Plan · ${p.modalidad}</p>
+                    <p style="font-size:22px;font-weight:900;color:#1f2937;margin:0;">
+                        $ ${precio.toLocaleString('es-UY')} <span style="font-size:13px;font-weight:400;color:#6b7280;">/ mes</span>
+                    </p>
+                </div>
+                <a href="#contacto" style="background:linear-gradient(90deg,#00bdd6,#007a8a);color:#fff;padding:8px 18px;border-radius:999px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;white-space:nowrap;text-decoration:none;transition:opacity .2s;" onmouseenter="this.style.opacity='.85'" onmouseleave="this.style.opacity='1'">
+                    Empezar
+                </a>`;
+        }
+
+        show(0);
+        setInterval(() => {
+            idx = (idx + 1) % precios.length;
+            badge.style.opacity = '0';
+            badge.style.transition = 'opacity 0.35s';
+            setTimeout(() => {
+                show(idx);
+                badge.style.opacity = '1';
+            }, 350);
         }, 3500);
     }
 
