@@ -63,15 +63,7 @@
                     <span class="brand-text shadow-text">LORENA LLIVIRÍA</span>
                 </div>
                 
-                <!-- Instagram-style Story widget -->
-                <div class="story-widget-container" id="story-widget" title="Novedades">
-                    <div class="story-ring active">
-                        <div class="story-avatar">
-                            <span class="material-symbols-outlined text-[#00bdd6] text-xl">event_note</span>
-                        </div>
-                    </div>
-                    <span class="story-label">Novedades</span>
-                </div>
+
 
                 <ul class="nav-links">
                     <li><a href="#hero">Inicio</a></li>
@@ -428,60 +420,35 @@
             <section class="py-24 bg-white border-t border-soft-grey relative overflow-hidden" id="horarios">
                 <div class="absolute top-0 right-0 w-1/2 h-full bg-soft-grey opacity-50 -z-10 clip-path-diagonal"></div>
                 <div class="mx-auto max-w-7xl px-6 lg:px-10">
-                    <div class="grid lg:grid-cols-2 gap-16">
-                        <div class="reveal-left flex flex-col h-full">
-                            <div class="lg:h-44">
-                                <h2 class="text-4xl font-black text-professional-grey mb-6">Horarios y Citas</h2>
-                                <p class="text-lg text-professional-grey/70 mb-8">Nuestra asistente virtual <strong class="text-[#00bdd6]">Loreley</strong> está disponible 24/7 para coordinar tu cita. Envíanos un mensaje por WhatsApp al <strong class="text-[#00bdd6]">099 707 544</strong> (no recibimos llamadas).</p>
-                            </div>
 
-                            <div class="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
-                                <table class="w-full text-left">
-                                    <thead class="bg-gray-50 text-professional-grey font-bold">
-                                        <tr>
-                                            <th class="p-4 border-b">Día</th>
-                                            <th class="p-4 border-b">Turno AM</th>
-                                            <th class="p-4 border-b">Turno PM</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="horarios-dynamic-container" class="text-professional-grey/80">
-                                        <!-- Los horarios se cargarán dinámicamente desde Firestore -->
-                                        <tr>
-                                            <td colspan="3" class="p-8 text-center text-professional-grey/40 italic">Cargando horarios actualizados...</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                    <!-- Section Title -->
+                    <div class="reveal-bottom mb-12">
+                        <h2 class="text-4xl font-black text-professional-grey mb-4">Horarios de Pilates</h2>
+                        <p class="text-lg text-professional-grey/70 max-w-2xl">Nuestra asistente virtual <strong class="text-[#00bdd6]">Loreley</strong> está disponible 24/7 para coordinar tu cita. WhatsApp: <strong class="text-[#00bdd6]">099 707 544</strong> (solo mensajes).</p>
+                    </div>
+
+                    <!-- Schedule Grid -->
+                    <div class="reveal-bottom mb-16">
+                        <div class="overflow-x-auto">
+                            <div class="min-w-[680px] w-full grid grid-cols-[auto_repeat(5,1fr)] gap-2 text-center pb-4" id="horarios-grid-container">
+                                <!-- JS populates this -->
+                                <div class="col-span-6 p-10 text-center text-professional-grey/40 italic">Cargando horarios...</div>
                             </div>
                         </div>
+                    </div>
 
-                        <div class="reveal-right flex flex-col h-full">
-                            <div class="lg:h-44">
-                                <h2 class="text-4xl font-black text-professional-grey mb-6">Visítanos</h2>
-                                <p class="text-lg text-professional-grey/70 mb-8">Estamos en 25 de Mayo 402, Tacuarembó, Uruguay. ¡Esperamos verte pronto!</p>
-                            </div>
-
-                            <div class="flex-grow flex flex-col justify-between space-y-8 lg:space-y-0">
-                                <!-- Map (Full width) -->
-                                <div class="w-full h-64 rounded-2xl overflow-hidden shadow-xl border border-gray-200">
-                                    <iframe
-                                        src="https://maps.google.com/maps?q=25%20de%20Mayo%20402%2C%20Tacuaremb%C3%B3%2C%20Uruguay&t=&z=16&ie=UTF8&iwloc=&output=embed"
-                                        width="100%" height="100%" style="border:0;" allowfullscreen=""
-                                        loading="lazy"></iframe>
-                                </div>
-                                <!-- Frente (Full width) -->
-                                <div class="w-full h-64 rounded-2xl overflow-hidden shadow-xl border border-gray-200">
-                                    <img src="Frente.jpeg" alt="Frente del local" class="w-full h-full object-cover">
-                                </div>
-                                <!-- Estudio Row (2 columns) -->
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div class="w-full h-64 rounded-2xl overflow-hidden shadow-xl border border-gray-200">
-                                        <img src="Estudio.jpeg" alt="Estudio de pilates" class="w-full h-full object-cover">
-                                    </div>
-                                    <div class="w-full h-64 rounded-2xl overflow-hidden shadow-xl border border-gray-200">
-                                        <img src="Estudio 2.jpeg" alt="Estudio de pilates 2" class="w-full h-full object-cover">
-                                    </div>
-                                </div>
-                            </div>
+                    <!-- Location below -->
+                    <div class="grid lg:grid-cols-3 gap-8 reveal-bottom">
+                        <!-- Map -->
+                        <div class="lg:col-span-2 w-full h-64 rounded-2xl overflow-hidden shadow-xl border border-gray-200">
+                            <iframe
+                                src="https://maps.google.com/maps?q=25%20de%20Mayo%20402%2C%20Tacuaremb%C3%B3%2C%20Uruguay&t=&z=16&ie=UTF8&iwloc=&output=embed"
+                                width="100%" height="100%" style="border:0;" allowfullscreen=""
+                                loading="lazy"></iframe>
+                        </div>
+                        <!-- Frente -->
+                        <div class="w-full h-64 rounded-2xl overflow-hidden shadow-xl border border-gray-200">
+                            <img src="Frente.jpeg" alt="Frente del local" class="w-full h-full object-cover">
                         </div>
                     </div>
                 </div>
@@ -746,52 +713,11 @@
             <span class="material-symbols-outlined text-3xl">smart_toy</span>
         </button>
 
-        <!-- Instagram Story Popup Modal -->
-        <div id="promo-story-modal" class="story-modal-overlay">
-            <div class="story-modal-container">
-                <!-- Top Progress Bars -->
-                <div class="story-progress-container">
-                    <div class="story-progress-bar"><div class="story-progress-fill"></div></div>
-                    <div class="story-progress-bar"><div class="story-progress-fill"></div></div>
-                    <div class="story-progress-bar"><div class="story-progress-fill"></div></div>
-                </div>
-
-                <!-- Header info -->
-                <div class="story-header">
-                    <div class="story-avatar-small">
-                        <img src="logo-500.png" alt="Lorena Logo">
-                    </div>
-                    <div class="story-info">
-                        <span class="story-username">lorena_lliviria</span>
-                        <span class="story-time">Novedades</span>
-                    </div>
-                    <button class="story-close-btn" id="promo-close-btn">
-                        <span class="material-symbols-outlined">close</span>
-                    </button>
-                </div>
-
-                <!-- Story Slides Content -->
-                <div class="story-slides-wrapper">
-                    <div class="story-slide active">
-                        <img src="promo1.jpg" alt="Nuevos Horarios">
-                    </div>
-                    <div class="story-slide">
-                        <img src="promo2.jpg" alt="Horarios Específicos">
-                    </div>
-                    <div class="story-slide">
-                        <img src="promo3.jpg" alt="Cupos Limitados">
-                    </div>
-                </div>
-
-                <!-- Left/Right Tap Zones for Navigation -->
-                <div class="story-nav-zone left" id="story-prev-zone"></div>
-                <div class="story-nav-zone right" id="story-next-zone"></div>
-            </div>
-        </div>
+        <!-- Story Modal removed -->
     </div>
 
     <script src="config.js"></script>
-    <script src="script.js?v=1.7"></script>
+    <script src="script.js?v=1.8"></script>
 </body>
 
 </html>

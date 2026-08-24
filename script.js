@@ -2,12 +2,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- API Data Load (direct from PostgreSQL via studio-main) ---
     const API_BASE = 'https://studio-main-1--studio-4748759464-52942.us-east4.hosted.app';
+    const GIMNASIO_ID = '06008afc-fff8-459a-b3cc-b53e79dd6c67';
 
     async function loadWebData() {
         try {
             const [horariosRes, preciosRes] = await Promise.all([
-                fetch(`${API_BASE}/api/web/horarios`),
-                fetch(`${API_BASE}/api/web/precios`)
+                fetch(`${API_BASE}/api/web/horarios?gimnasio_id=${GIMNASIO_ID}`),
+                fetch(`${API_BASE}/api/web/precios?gimnasio_id=${GIMNASIO_ID}`)
             ]);
 
             if (horariosRes.ok) {
@@ -33,40 +34,60 @@ document.addEventListener('DOMContentLoaded', () => {
     loadWebData();
 
     function renderDynamicSchedules(horarios) {
-        const container = document.getElementById('horarios-dynamic-container');
+        const container = document.getElementById('horarios-grid-container');
         if (!container) return;
 
-        if (horarios.length === 0) {
-            container.innerHTML = '<tr><td colspan="3" class="p-8 text-center">No hay horarios disponibles.</td></tr>';
+        if (!horarios || horarios.length === 0) {
+            container.innerHTML = '<div class="col-span-6 p-10 text-center text-professional-grey/40 italic">No hay horarios disponibles.</div>';
             return;
         }
 
-        // Agrupar por día para armar la tabla
-        const diasSemana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
-        let html = '';
+        const diasMostrados = [1, 2, 3, 4, 5]; // Lunes a Viernes
+        const nombreDias = ['DOMINGO', 'LUNES', 'MARTES', 'MIÉRCOLES', 'JUEVES', 'VIERNES', 'SÁBADO'];
 
-        diasSemana.forEach((dia, index) => {
-            const horariosDia = horarios.filter(h => h.nombre_dia === dia);
-            if (horariosDia.length === 0 && index > 3) return; // Omitir viernes/fin de semana si no hay nada
+        // Get unique times sorted
+        const times = [...new Set(horarios.map(h => (h.hora || '').substring(0, 5)))]
+            .filter(Boolean).sort();
 
-            const am = horariosDia.filter(h => parseInt(h.hora.split(':')[0]) < 12);
-            const pm = horariosDia.filter(h => parseInt(h.hora.split(':')[0]) >= 12);
+        // Color por actividad (paleta Lorena)
+        function getCellStyle(actName) {
+            const lower = (actName || '').toLowerCase();
+            if (lower.includes('pilates')) return 'background: linear-gradient(135deg,#00bdd6,#009bb5); color:#fff;';
+            if (lower.includes('fisio'))  return 'background: linear-gradient(135deg,#6366f1,#4f46e5); color:#fff;';
+            if (lower.includes('laboral')) return 'background: linear-gradient(135deg,#10b981,#059669); color:#fff;';
+            return 'background: linear-gradient(135deg,#00bdd6,#009bb5); color:#fff;';
+        }
 
-            html += `<tr class="border-b ${index % 2 !== 0 ? 'bg-gray-50/50' : ''}">
-                <td class="p-4 font-semibold">${dia}</td>
-                <td class="p-4">${am.length > 0 ? am.map(p => `
-                    <div class="mb-2 last:mb-0">
-                        <div class="text-[#00bdd6] font-bold">${p.hora.substring(0, 5)} hs</div>
-                        <div class="text-[10px] sm:text-xs text-professional-grey/60 leading-tight">*Inicio. Duración ${p.duracion_min}m</div>
-                    </div>
-                `).join('') : '--'}</td>
-                <td class="p-4">${pm.length > 0 ? pm.map(p => `
-                    <div class="mb-2 last:mb-0">
-                        <div class="text-[#00bdd6] font-bold">${p.hora.substring(0, 5)} hs</div>
-                        <div class="text-[10px] sm:text-xs text-professional-grey/60 leading-tight">*Inicio. Duración ${p.duracion_min}m</div>
-                    </div>
-                `).join('') : '--'}</td>
-            </tr>`;
+        // Header row
+        let html = '<div></div>'; // empty top-left cell
+        diasMostrados.forEach(diaNum => {
+            html += `<div style="background:#f5f8f8; border:1px solid #e5e7eb; border-radius:12px; padding:12px 6px; font-size:11px; font-weight:700; letter-spacing:0.08em; color:#00bdd6; display:flex; align-items:center; justify-content:center;">${nombreDias[diaNum]}</div>`;
+        });
+
+        // Time rows
+        times.forEach(time => {
+            // Time label
+            html += `<div style="display:flex; align-items:center; justify-content:flex-end; padding-right:12px; font-size:13px; font-weight:700; color:#00bdd6; white-space:nowrap;">${time}</div>`;
+
+            diasMostrados.forEach(diaNum => {
+                const clase = horarios.find(h =>
+                    Number(h.dia_semana) === diaNum && (h.hora || '').startsWith(time)
+                );
+
+                if (clase) {
+                    const act = clase.nombre_actividad || 'Pilates';
+                    const dur = clase.duracion_min ? `${clase.duracion_min}m` : '';
+                    const cupos = clase.cupos_disponibles != null ? `${clase.cupos_disponibles} cupos` : '';
+                    const cellStyle = getCellStyle(act);
+                    html += `<div style="${cellStyle} border-radius:10px; padding:10px 6px; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:60px; cursor:pointer; transition:transform .2s, box-shadow .2s; box-shadow: 0 2px 8px rgba(0,189,214,0.15);" onmouseenter="this.style.transform='scale(1.05)';this.style.boxShadow='0 6px 20px rgba(0,189,214,0.35)'" onmouseleave="this.style.transform='scale(1)';this.style.boxShadow='0 2px 8px rgba(0,189,214,0.15)'" onclick="document.getElementById('contacto').scrollIntoView({behavior:'smooth'})">
+                        <span>${act}</span>
+                        ${dur ? `<span style="font-size:9px;opacity:0.85;font-weight:400;margin-top:3px;">${dur}</span>` : ''}
+                        ${cupos ? `<span style="font-size:9px;opacity:0.75;font-weight:400;">${cupos}</span>` : ''}
+                    </div>`;
+                } else {
+                    html += '<div></div>';
+                }
+            });
         });
 
         container.innerHTML = html;
@@ -729,131 +750,5 @@ document.addEventListener('DOMContentLoaded', () => {
         contactObserver.observe(contactSection);
     }
 
-    // --- Instagram Stories Promo Logic ---
-    const storyModal = document.getElementById('promo-story-modal');
-    const storyWidget = document.getElementById('story-widget');
-    const storyRing = storyWidget ? storyWidget.querySelector('.story-ring') : null;
-    const promoCloseBtn = document.getElementById('promo-close-btn');
-    const slides = Array.from(document.querySelectorAll('.story-slide'));
-    const progressFills = Array.from(document.querySelectorAll('.story-progress-fill'));
-    const tapLeft = document.getElementById('story-prev-zone');
-    const tapRight = document.getElementById('story-next-zone');
-
-    let currentSlideIndex = 0;
-    let storyTimer = null;
-    let progressInterval = null;
-    let progressPercent = 0;
-    const slideDuration = 5000; // 5 seconds per slide
-    const progressStepTime = 50; // update progress fill every 50ms
-
-    // Mark as viewed in localStorage if already seen once
-    if (localStorage.getItem('lorena_story_viewed') && storyRing) {
-        storyRing.classList.add('viewed');
-    }
-
-    function openStoryModal() {
-        if (!storyModal) return;
-        currentSlideIndex = 0;
-        storyModal.classList.add('active');
-        showSlide(currentSlideIndex);
-        
-        // Remove gradient color ring to indicate viewed
-        if (storyRing) {
-            storyRing.classList.add('viewed');
-            localStorage.setItem('lorena_story_viewed', 'true');
-        }
-    }
-
-    function closeStoryModal() {
-        if (!storyModal) return;
-        storyModal.classList.remove('active');
-        clearTimers();
-    }
-
-    function showSlide(index) {
-        clearTimers();
-        currentSlideIndex = index;
-
-        // Active slide visibility
-        slides.forEach((slide, i) => {
-            if (i === index) {
-                slide.classList.add('active');
-            } else {
-                slide.classList.remove('active');
-            }
-        });
-
-        // Set progress bars state
-        progressFills.forEach((fill, i) => {
-            if (i < index) {
-                fill.style.width = '100%';
-            } else if (i > index) {
-                fill.style.width = '0%';
-            } else {
-                fill.style.width = '0%';
-            }
-        });
-
-        // Animate progress fill for current slide
-        progressPercent = 0;
-        const totalSteps = slideDuration / progressStepTime;
-        progressInterval = setInterval(() => {
-            progressPercent += 100 / totalSteps;
-            if (progressPercent >= 100) {
-                progressFills[index].style.width = '100%';
-                clearInterval(progressInterval);
-                nextSlide();
-            } else {
-                progressFills[index].style.width = `${progressPercent}%`;
-            }
-        }, progressStepTime);
-    }
-
-    function nextSlide() {
-        if (currentSlideIndex < slides.length - 1) {
-            showSlide(currentSlideIndex + 1);
-        } else {
-            closeStoryModal();
-        }
-    }
-
-    function prevSlide() {
-        if (currentSlideIndex > 0) {
-            showSlide(currentSlideIndex - 1);
-        } else {
-            // Re-start current slide if first slide
-            showSlide(0);
-        }
-    }
-
-    function clearTimers() {
-        if (progressInterval) {
-            clearInterval(progressInterval);
-            progressInterval = null;
-        }
-    }
-
-    // Auto trigger popup after 3 seconds on page load
-    setTimeout(() => {
-        // Only auto-trigger once per browser session
-        if (!sessionStorage.getItem('lorena_story_auto_triggered')) {
-            sessionStorage.setItem('lorena_story_auto_triggered', 'true');
-            openStoryModal();
-        }
-    }, 3000);
-
-    // Event listeners
-    if (storyWidget) storyWidget.addEventListener('click', openStoryModal);
-    if (promoCloseBtn) promoCloseBtn.addEventListener('click', closeStoryModal);
-    if (tapLeft) tapLeft.addEventListener('click', prevSlide);
-    if (tapRight) tapRight.addEventListener('click', nextSlide);
-
-    // Close when clicking outside container
-    if (storyModal) {
-        storyModal.addEventListener('click', (e) => {
-            if (e.target === storyModal) {
-                closeStoryModal();
-            }
-        });
-    }
+    // Stories Promo removido
 });
