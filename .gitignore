@@ -6,4 +6,16 @@ config.js
 
 # Archivos de sistema
 .DS_Store
-Thumbs.db
+Thumbbs.db
+
+# Dependencias (usadas solo para optimización local)
+node_modules/
+package.json
+package-lock.json
+
+# Imágenes originales sin optimizar (reemplazadas por .webp)
+*.png
+*.jpg
+*.jpeg
+# Excepciones: iconos que deben mantenerse
+!icon-192x192.png
